@@ -40,6 +40,12 @@ public class SpellCheck {
         sb = new StringBuffer("");
         Log.wtf("INPUT", message);
         String words[] = message.split(WHITESPACE);
+        message = "";
+        for (String ws: words) {
+            message += new Contraction().contractionize(ws) + " ";
+        }
+        Log.wtf("After Contraction", message);
+        words = message.split(WHITESPACE);
         /*String tempWord = "";
         for (char wrd: words[words.length-1].toCharArray()){
             Log.wtf("WORD: ", Character.toString(wrd));
