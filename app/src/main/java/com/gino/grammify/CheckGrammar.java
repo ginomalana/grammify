@@ -151,7 +151,11 @@ public class CheckGrammar extends AppCompatActivity {
                                         }
                                         popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
                                             public boolean onMenuItemClick(MenuItem item) {
-                                                Toast.makeText(CheckGrammar.this, "You Clicked : " + item.getTitle(), Toast.LENGTH_SHORT).show();
+                                                //Toast.makeText(CheckGrammar.this, "You Clicked : " + item.getTitle(), Toast.LENGTH_SHORT).show();
+                                                for (int l = 0; l < suggst.size(); l++) {
+                                                    if (suggst.get(l).get(2).equals(markedWord))
+                                                        suggst.remove(l);
+                                                }
                                                 String replacement = sentence.get(positionI).replace(markedWord, item.getTitle().toString());
                                                 SetSuggestion(suggst, paragraph.replace(sentence.get(positionI), replacement));
                                                 return true;
