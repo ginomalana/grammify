@@ -30,4 +30,5 @@ dependencies {
     compile 'com.android.support:design:23.1.1'
     compile files('libs/opennlp-tools-1.6.0.jar')
     compile files('libs/stanford-postagger.jar')
+    compile 'com.android.support:support-v4:23.1.1'
 }

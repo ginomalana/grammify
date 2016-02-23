@@ -2,10 +2,13 @@ package com.gino.grammify;
 
 import android.Manifest;
 import android.app.Dialog;
+import android.app.FragmentManager;
+import android.app.Fragment;
 import android.app.ProgressDialog;
 import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Typeface;
 import android.os.AsyncTask;
@@ -21,13 +24,12 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.text.InputFilter;
-import android.text.SpannableString;
-import android.text.Spanned;
-import android.text.TextUtils;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.ImageButton;
@@ -66,6 +68,8 @@ public class MainActivity extends AppCompatActivity
     private TextView status;
     private ImageButton button;
     protected static final int RESULT_SPEECH = 1;
+
+    View topLevelLayout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -112,6 +116,13 @@ public class MainActivity extends AppCompatActivity
         final EditText editText = (EditText)findViewById(R.id.editText);
         final TextView wordCount = (TextView) findViewById(R.id.textView6);
 
+        //TEMP
+        topLevelLayout = findViewById(R.id.top_layout);
+        if (isFirstTime()) {
+            topLevelLayout.setVisibility(View.INVISIBLE);
+        }
+        //TEMP
+        /*
         final TextWatcher txwatcher = new TextWatcher() {
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
             }
@@ -136,7 +147,7 @@ public class MainActivity extends AppCompatActivity
             }
         };
         editText.addTextChangedListener(txwatcher);
-
+*/
     }
 
     //MARSHMALLOW PERMISSION
@@ -203,7 +214,20 @@ public class MainActivity extends AppCompatActivity
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
         // Handle navigation view item clicks here.
+        Fragment fragment = null;
+        FragmentManager fragmentManager = getFragmentManager();
+
+
         int id = item.getItemId();
+        if (id == R.id.nav_menu) {
+            fragment = new MyFragment1();
+        } else if (id == R.id.nav_about) {
+            fragment = new MyFragment2();
+        }
+        fragmentManager.beginTransaction()
+                .replace(R.id.contentabout, fragment)
+                .commit();
+
 /*
         if (id == R.id.nav_camera) {
             // Handle the camera action
@@ -222,6 +246,23 @@ public class MainActivity extends AppCompatActivity
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
+    }
+    public static class MyFragment1 extends Fragment {
+        @Override
+        public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                                 Bundle savedInstanceState) {
+            // Inflate the layout for this fragment
+            return inflater.inflate(R.layout.content_main, container, false);
+        }
+    }
+
+    public static class MyFragment2 extends Fragment {
+        @Override
+        public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                                 Bundle savedInstanceState) {
+            // Inflate the layout for this fragment
+            return inflater.inflate(R.layout.content_about, container, false);
+        }
     }
 
 
@@ -395,6 +436,32 @@ public class MainActivity extends AppCompatActivity
             output.close();
             input.close();
         }
+
+    }
+
+    private boolean isFirstTime()
+    {
+        SharedPreferences preferences = getPreferences(MODE_PRIVATE);
+        boolean ranBefore = preferences.getBoolean("RanBefore", false);
+        if (!ranBefore) {
+
+            SharedPreferences.Editor editor = preferences.edit();
+            editor.putBoolean("RanBefore", true);
+            editor.commit();
+            topLevelLayout.setVisibility(View.VISIBLE);
+            topLevelLayout.setOnTouchListener(new View.OnTouchListener(){
+
+                @Override
+                public boolean onTouch(View v, MotionEvent event) {
+                    topLevelLayout.setVisibility(View.INVISIBLE);
+                    return false;
+                }
+
+            });
+
+
+        }
+        return ranBefore;
 
     }
 

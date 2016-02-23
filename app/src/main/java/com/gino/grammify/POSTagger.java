@@ -34,7 +34,7 @@ public class POSTagger {
     static int ctrModel = 0;
 
     static StringBuilder posTag;
-    static ArrayList chunk;
+    static ArrayList<ArrayList<String>> chunk;
 
     public POSTagger() {
         if (ctrModel++ < 1 )
@@ -43,7 +43,7 @@ public class POSTagger {
 
     public POSTagger(String sentence) {
         posTag = new StringBuilder("");
-        chunk = new ArrayList<String>();
+        chunk = new ArrayList<ArrayList<String>>();
         // TODO code application logic here
         try{
             chunk(sentence);
@@ -79,9 +79,9 @@ public class POSTagger {
         }
         perfMon.start();
         for (int i = 0; i < splittedSentence.size(); i++) {
+            ArrayList<String> chunkPerSentence = new ArrayList<String>();
             ObjectStream<String> lineStream = new PlainTextByLineStream(
                     new StringReader(splittedSentence.get(i).get(0)));
-            //Log.wtf("Tagging", splittedSentence.get(i).get(0));
 
             String line;
             String whitespaceTokenizerLine[] = null;
@@ -101,20 +101,25 @@ public class POSTagger {
             String result[] = chunkerME.chunk(whitespaceTokenizerLine, tags);
 
             for (String s : result)
-                chunk.add(s);
+                chunkPerSentence.add(s);
 
             Span[] span = chunkerME.chunkAsSpans(whitespaceTokenizerLine, tags);
             for (Span s : span)
-                chunk.add(s.toString());
+                chunkPerSentence.add(s.toString());
+
+            chunk.add(chunkPerSentence);
         }
         Log.wtf("FINAL OUTPUT: ", posTag.toString());
+        for (int x = 0; x < chunk.size(); x++) {
+            Log.wtf("Chunkify", chunk.get(x).toString());
+        }
     }
 
     public String GetTags(){
         return posTag.toString();
     }
 
-    public ArrayList<String> getChunk() {
+    public ArrayList<ArrayList<String>> getChunk() {
         return chunk;
     }
 

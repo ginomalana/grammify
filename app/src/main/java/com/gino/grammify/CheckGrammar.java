@@ -70,6 +70,16 @@ public class CheckGrammar extends AppCompatActivity {
         final TextView textView5 = (TextView)findViewById(R.id.textView5);
         textView5.setTypeface(face);
 
+        //TEMP
+        final View topLevelLayout = findViewById(R.id.top_layout_second);
+        topLevelLayout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                topLevelLayout.setVisibility(View.INVISIBLE);
+            }
+        });
+        //TEMP
+
 
 
         try {
@@ -88,7 +98,7 @@ public class CheckGrammar extends AppCompatActivity {
     public void SetSuggestion(final ArrayList<ArrayList<String>> suggst, final String paragraph) {
         final TextView textView2 = (TextView) findViewById(R.id.textView2);
         final ArrayList<String> sentence = new ArrayList<String>();
-        int [] errors = {0,0,0,0,0};
+        int [] errors = {0,0,0,0,0,0};
 
         // Sentence Tokenization
         Pattern delimiter = Pattern.compile("[^.!?\\s][^.!?]*(?:[.!?](?!['\"]?\\s|$)"
@@ -151,8 +161,11 @@ public class CheckGrammar extends AppCompatActivity {
                                         }
                                         popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
                                             public boolean onMenuItemClick(MenuItem item) {
+                                                Log.wtf("Click", "clicked");
                                                 //Toast.makeText(CheckGrammar.this, "You Clicked : " + item.getTitle(), Toast.LENGTH_SHORT).show();
+                                                Log.wtf("Marked", markedWord);
                                                 for (int l = 0; l < suggst.size(); l++) {
+                                                    Log.wtf("Click", suggst.get(l).get(2));
                                                     if (suggst.get(l).get(2).equals(markedWord))
                                                         suggst.remove(l);
                                                 }
@@ -212,12 +225,57 @@ public class CheckGrammar extends AppCompatActivity {
                         }
                         errors[3]++;
                     }
+                    else if (Integer.parseInt(suggst.get(j).get(1)) == 5) { // S/V AGREEMENT
+                        final int positionJ = j;
+                        //FIND WORD
+                        for (int k = 0; k < suggst.get(j).size(); k++) {
+                            Log.wtf("SENTENCE", sentence.get(i));
+                            Log.wtf("WORD", suggst.get(j).get(2));
+                            if (sentence.get(i).contains(suggst.get(j).get(2))) {
+                                final String markedWord = suggst.get(j).get(2);
+                                Log.wtf("Marked word", markedWord);
+                                ClickableSpan clickableSpan = new ClickableSpan() {
+                                    @Override
+                                    public void onClick(View textView) {
+                                        PopupMenu popup = new PopupMenu(CheckGrammar.this, textView);
+                                        popup.getMenuInflater().inflate(R.menu.popup_menu, popup.getMenu());
+                                        Log.wtf("# of Sugg", Integer.toString(suggst.get(positionJ).size()));
+                                        for (int k = 3; k < ((ArrayList) suggst.get(positionJ)).size(); k++) {
+                                            Log.wtf("Suggestion", suggst.get(positionJ).get(k));
+                                            popup.getMenu().add(k - 2, R.id.slot1, k - 2, suggst.get(positionJ).get(k));
+                                        }
+                                        popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+                                            public boolean onMenuItemClick(MenuItem item) {
+                                                //Toast.makeText(CheckGrammar.this, "You Clicked : " + item.getTitle(), Toast.LENGTH_SHORT).show();
+                                                for (int l = 0; l < suggst.size(); l++) {
+                                                    if (suggst.get(l).get(2).equals(markedWord))
+                                                        suggst.remove(l);
+                                                }
+                                                String replacement = sentence.get(positionI).replace(markedWord, item.getTitle().toString());
+                                                SetSuggestion(suggst, paragraph.replace(sentence.get(positionI), replacement));
+                                                return true;
+                                            }
+                                        });
+                                        popup.show();
+                                    }
+                                };
+                                ss.setSpan(clickableSpan,
+                                        paragraph.indexOf(sentence.get(i)) + sentence.get(i).indexOf(suggst.get(j).get(2)), //START
+                                        paragraph.indexOf(sentence.get(i)) + sentence.get(i).indexOf(suggst.get(j).get(2)) + suggst.get(j).get(2).length(), //END
+                                        Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+                            }
+                        }
+                        errors[5]++;
+                    }
                 }
             }
         }
         textView2.setText(ss);
         textView2.setMovementMethod(LinkMovementMethod.getInstance());
-        textView2.setLinkTextColor(Color.GREEN);
+        if (errors[4] > 0)
+            textView2.setLinkTextColor(Color.GREEN);
+        if (errors[5] > 0)
+            textView2.setLinkTextColor(Color.BLUE);
         textView2.setHighlightColor(Color.TRANSPARENT);
 
         String appendMark = "";
@@ -231,6 +289,8 @@ public class CheckGrammar extends AppCompatActivity {
             appendMark += ("\n⚫ Plural and Possesive");
         if (errors[4] > 0)
             appendMark += ("\n⚫ Subject Verb Agreement");
+        if (errors[5] > 0)
+            appendMark += ("\n⚫ Pronoun Error");
 
         SpannableString markings = new SpannableString(appendMark);
 
@@ -267,6 +327,13 @@ public class CheckGrammar extends AppCompatActivity {
                     appendMark.indexOf("⚫ Subject Verb Agreement") + "⚫ Subject Verb Agreement".length(), //END
                     Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
         }
+        if (errors[5] > 0) {
+            markings.setSpan(new ForegroundColorSpan(/*getResources().getColor(R.color.green)*/ Color.BLUE),
+                    appendMark.indexOf("⚫ Pronoun Error"), //START
+                    appendMark.indexOf("⚫ Pronoun Error") + "⚫ Pronoun Error".length(), //END
+                    Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+        }
+
         textView2.append(markings);
     }
 

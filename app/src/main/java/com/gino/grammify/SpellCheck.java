@@ -17,7 +17,7 @@ import java.util.List;
 public class SpellCheck {
 
     private static Context cntx;
-    public static List<Integer> dist;
+    //public static List<Integer> dist;
     public String pattern = ",.!?";
     public static StringBuffer sb;
     public static InputStream inputStrm;
@@ -25,6 +25,8 @@ public class SpellCheck {
     public static ArrayList<ArrayList<String>> corrections;
     public static ArrayList<String> wordList;
     public final String WHITESPACE = " ";
+
+    static boolean hasApos;
 
     public SpellCheck() {
     }
@@ -35,6 +37,7 @@ public class SpellCheck {
     }
 
     public SpellCheck(String message, Context context) throws IOException {
+
         corrections = new ArrayList<ArrayList<String>>();
         cntx = context;
         sb = new StringBuffer("");
@@ -58,15 +61,39 @@ public class SpellCheck {
 
 
         int ctr = 0;
-
         for (String word : words) {
             ctr++;
             char punctuation = ' ';
+            hasApos = false;
+            String apos = "";
             if (!Character.isDigit(word.charAt(0))) {
                 //Check for word case
                 boolean wordCase = Character.isUpperCase(word.charAt(0));
+                hasApos = word.contains("'");
+                String wrd ="";
+                if (hasApos) {
+                    boolean yes = false;
+                    for (Character s: word.toCharArray()) {
+                        if (s.equals('\'')) {
+                            apos += s;
+                            yes = true;
+                        }
+                        else {
+                            if (yes)
+                                apos += s;
+                            else
+                                wrd += s;
+                        }
+                    }
+                    Log.wtf("WORD", wrd);
+                    word = wrd;
+                }
+
                 if (wordCase && ctr > 1) {
-                    sb.append(word);
+                    if (hasApos)
+                        sb.append(word + apos);
+                    else
+                        sb.append(word);
                 } else {
                     //lowercase
                     word = word.toLowerCase();
@@ -82,13 +109,19 @@ public class SpellCheck {
                     //find word
                     for (String wr: wordList) {
                         if (wr.equals(word)) {
-                            if (wordCase)
+                            if (wordCase && hasApos)
+                                sb.append(Character.toUpperCase(word.charAt(0)) + (word.substring(1)) + apos);
+                            else if (wordCase)
                                 sb.append(Character.toUpperCase(word.charAt(0)) + (word.substring(1)));
+                            else if (hasApos)
+                                sb.append(word + apos);
                             else
                                 sb.append(word);
+
                             if (punctuation != ' ')
                                 sb.append(punctuation);
                             wordFound = true;
+
                             break;
                         } else
                             wordFound = false;
@@ -99,16 +132,23 @@ public class SpellCheck {
 
                         //store distance
                         ArrayList<String> w;
-
-                        Log.wtf("Storing", "Distance");
+                        /*
                         //Store all distance from word
                         dist = new ArrayList<Integer>();
-                        for (String wr: wordList)
-                            dist.add(distance(wr.toCharArray(), word.toCharArray()));
-                        Log.wtf("Stored", "Distance");
 
+                        for (String wr: wordList) {
+                            //Log.wtf("MATCH", wr + " WORD: " + word);
+                            for (int x = 0; x < word.length(); x++) {
+                                if (word.length() > x && wr.length() > x) {
+                                    if (wr.charAt(x) == word.charAt(x)) {
+                                        dist.add(distance(wr.toCharArray(), word.toCharArray()));
+                                        break;
+                                    }
+                                }
+                            }
+                        }*/
                         //Sort distance from word
-                        Collections.sort(dist);
+                        //Collections.sort(dist);
                         w = new ArrayList<String>();
                         w.add(word);
 
@@ -116,23 +156,36 @@ public class SpellCheck {
                         sb.append("[" + word + "]");
 
                         for (String wr: wordList) {
-                            String line = wr;
-                            if (distance(line.toCharArray(), word.toCharArray()) == dist.get(0)) {
-                                if (wordCase)
-                                    w.add(line.charAt(0) + line.substring(1));
-                                else {
-                                    //if (punctuation != ' ')
-                                    //line = line + punctuation;
-                                    w.add(line);
+                            for (int x = 0; x < word.length(); x++) {
+                                if (word.length() > x && wr.length() > x) {
+                                    if (wr.charAt(x) == word.charAt(x)) {
+                                        //Log.wtf("DISTANCE", Boolean.toString(distance(wr.toCharArray(), word.toCharArray()) == dist.get(0)));
+                                        if (distance(wr.toCharArray(), word.toCharArray()) /*== dist.get(0)*/ <= 2 ) {
+                                            String sugg;
+                                            if (wordCase && hasApos)
+                                                sugg = Character.toUpperCase(wr.charAt(0)) + wr.substring(1) + apos;
+                                            else if (wordCase)
+                                                sugg = Character.toUpperCase(wr.charAt(0)) + wr.substring(1);
+                                            else if (hasApos)
+                                                sugg = wr + apos;
+                                            else
+                                                sugg = wr;
+
+                                            if (punctuation != ' ')
+                                                sugg += punctuation;
+                                            w.add(sugg);
+                                        }
+                                        break;
+                                    }
                                 }
                             }
                         }
                         corrections.add(w);
                     }
                 }
-            } else {
-                sb.append(word + " ");
             }
+            else
+                sb.append(word);
             if (ctr == words.length) {
                 if (punctuation == ' ') {
                     sb.append(".");
@@ -222,7 +275,7 @@ public class SpellCheck {
                 wordList = new ArrayList<String>();
                 String line;
                 while ((line = in.readLine()) != null) {
-                   // Log.wtf("WORD", line);
+                    // Log.wtf("WORD", line);
                     wordList.add(line.toString());
                 }
             } catch (Exception e) {
