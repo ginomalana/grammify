@@ -280,6 +280,8 @@ public class MainActivity extends AppCompatActivity
     }
 
     public void CheckGrammar(View view) {
+        InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+        imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
         sentence = input.getText().toString();
         if (sentence.length() == 0)
             Toast("Please enter sentence");
