@@ -65,6 +65,9 @@ public class GrammarRules extends AppCompatActivity {
                 String[] wordAndTag = splitSentence[i].split("_");
                 words[i][0] = wordAndTag[0];
                 words[i][1] = wordAndTag[1];
+                if(words[i][0].equalsIgnoreCase("am")){
+                    words[i][1] = "VBP";
+                }
                 //words[i][1] = wordAndTag[1].equals("were")? "VBP": "VBZ";
                 Log.wtf("Word", words[i][0] + "\tTag: " + words[i][1]);
             }
@@ -129,7 +132,7 @@ public class GrammarRules extends AppCompatActivity {
             int basicsingular = BasicRuleSingular(words);
             int basicplural = BasicRulePlural(words);
             int arti = IndefiniteArticle(words);
-            int frag = Fragments(words, chunk.get(x));
+            int frag = Fragments(words, chunk.get(x), isQuestion);
             int basicI = BasicI(words);
             int runOn = RunOn(chunk.get(x),words);
 
@@ -330,6 +333,7 @@ public class GrammarRules extends AppCompatActivity {
                     //sb.append("\nRule 10");
                 }
                 if (comp > 0 && errorOccur == 0) {
+                    Log.wtf("RULE comp", "true");
                     ArrayList<String> ruleList = new ArrayList<String>();
                     ruleList.add(Integer.toString(x));
                     ruleList.add("2"); ////COLOR
@@ -339,6 +343,7 @@ public class GrammarRules extends AppCompatActivity {
                     errorOccur++;
                 }
                 if (ha > 0 && errorOccur == 0) {
+                    Log.wtf("RULE ha", "true");
                     ArrayList<String> ruleList = new ArrayList<String>();
                     ruleList.add(Integer.toString(x));
                     ruleList.add("2"); ////COLOR
@@ -354,6 +359,7 @@ public class GrammarRules extends AppCompatActivity {
                     errorOccur++;
                 }
                 if (basicyou > 0 && errorOccur == 0) {
+                    Log.wtf("RULE basicyou", "true");
                     ArrayList<String> ruleList = new ArrayList<String>();
                     ruleList.add(Integer.toString(x));
                     ruleList.add("2"); ////COLOR
@@ -363,6 +369,7 @@ public class GrammarRules extends AppCompatActivity {
                     errorOccur++;
                 }
                 if (basicyour > 0 && errorOccur == 0) {
+                    Log.wtf("RULE basicyour", "true");
                     ArrayList<String> ruleList = new ArrayList<String>();
                     ruleList.add(Integer.toString(x));
                     ruleList.add("5"); ////COLOR
@@ -372,31 +379,50 @@ public class GrammarRules extends AppCompatActivity {
                     errorOccur++;
                 }
                 if (proplural > 0 && errorOccur == 0) {
+                    Log.wtf("RULE proplural", "true");
                     ArrayList<String> ruleList = new ArrayList<String>();
                     ruleList.add(Integer.toString(x));
                     ruleList.add("5"); ////COLOR
                     ruleList.add(words[proplural][0]);
-                    ruleList.add("they");
-                    ruleList.add("those");
-                    ruleList.add("these");
-                    ruleList.add("you");
+                    if(words[prosingular][0].equalsIgnoreCase("you")){
+                        ruleList.add("your");
+                    }
+                    else if(words[prosingular][0].equalsIgnoreCase("your")){
+                        ruleList.add("you");
+                    }
+                    else {
+                        ruleList.add("they");
+                        ruleList.add("those");
+                        ruleList.add("these");
+                        ruleList.add("you");
+                    }
                     suggestions.add(ruleList);
                     errorOccur++;
                 }
                 if (prosingular > 0 && errorOccur == 0) {
+                    Log.wtf("RULE prosing", "true");
                     ArrayList<String> ruleList = new ArrayList<String>();
                     ruleList.add(Integer.toString(x));
                     ruleList.add("5"); ////COLOR
                     ruleList.add(words[prosingular][0]);
-                    ruleList.add("that");
-                    ruleList.add("this");
-                    ruleList.add("he");
-                    ruleList.add("she");
-                    ruleList.add("it");
+                    if(words[prosingular][0].equalsIgnoreCase("you")){
+                        ruleList.add("your");
+                    }
+                    else if(words[prosingular][0].equalsIgnoreCase("your")){
+                        ruleList.add("you");
+                    }
+                    else {
+                        ruleList.add("that");
+                        ruleList.add("this");
+                        ruleList.add("he");
+                        ruleList.add("she");
+                        ruleList.add("it");
+                    }
                     suggestions.add(ruleList);
                     errorOccur++;
                 }
                 if(basicI > -1 && errorOccur == 0){
+                    Log.wtf("RULE basicI", "true");
                     ArrayList<String> ruleList = new ArrayList<String>();
                     ruleList.add(Integer.toString(x));
                     ruleList.add("5"); ////COLOR
@@ -415,6 +441,7 @@ public class GrammarRules extends AppCompatActivity {
                     errorOccur++;
                 }
                 else if (basicplural > 0 && errorOccur == 0) {
+                    Log.wtf("RULE basicplural", "true");
                     ArrayList<String> ruleList = new ArrayList<String>();
                     ruleList.add(Integer.toString(x));
                     ruleList.add("2"); ////COLOR
@@ -424,7 +451,12 @@ public class GrammarRules extends AppCompatActivity {
                         // Log.wtf("BASIC PLURAL", "I AM");
                     }
                     else {*/
-                    ruleList.add(new Inflector().singularize(words[basicplural][0]));
+                    if(words[basicplural][0].equalsIgnoreCase("am")){
+                        ruleList.add("are");
+                    }
+                    else {
+                        ruleList.add(new Inflector().singularize(words[basicplural][0]));
+                    }
                     //Log.wtf("BASIC PLURAL", "I PLURAL");
                     //}
                     suggestions.add(ruleList);
@@ -434,11 +466,17 @@ public class GrammarRules extends AppCompatActivity {
 
 
                 else if (basicsingular > 0 && errorOccur == 0) {
+                    Log.wtf("RULE basicsing", "true");
                     ArrayList<String> ruleList = new ArrayList<String>();
                     ruleList.add(Integer.toString(x));
                     ruleList.add("2"); ////COLOR
                     ruleList.add(words[basicsingular][0]);
-                    ruleList.add(new Inflector().pluralize(words[basicsingular][0]));
+                    if(words[basicsingular][0].equalsIgnoreCase("am")){
+                        ruleList.add("is");
+                    }
+                    else {
+                        ruleList.add(new Inflector().pluralize(words[basicsingular][0]));
+                    }
                     suggestions.add(ruleList);
                     errorOccur++;
                 }
@@ -485,6 +523,7 @@ public class GrammarRules extends AppCompatActivity {
                     ArrayList<String> highlight = PluralPos(words);
                     ruleList.addAll(highlight);
 
+
                     suggestions.add(ruleList);
 
                 }
@@ -526,7 +565,9 @@ public class GrammarRules extends AppCompatActivity {
                 "\nrunOnFrag: " + runOnFrag +
                 "\nCtr: " + ctr);
 */
-            //output = sb.toString();
+            //output = sb.toStrin
+            //
+            // g();
             sntnc = sb.toString();
         }
         for (int i = 0; i < suggestions.size(); i++){
@@ -890,7 +931,7 @@ public class GrammarRules extends AppCompatActivity {
                 }
             }
             else{
-                if(words[i][1].contains("VB") && words[i+1][1].equals("DT") && words[i+2][1].equals("JJ")){
+                if( i != words.length - 2 && (words[i][1].contains("VB") && words[i+1][1].equals("DT") && words[i+2][1].equals("JJ"))){
                     errorOccur++;
                     if(words[i][1].equals("VBZ")) {
                         Log.wtf("RULE FOUR", " " + i);
@@ -963,32 +1004,35 @@ public class GrammarRules extends AppCompatActivity {
     public static int BasicRulePlural(String words[][]){
         for (int i = 0; i<words.length; i ++) {
             //roses [is] beautiful
-            if (words[i][1].equals("NNS") || words[i][1].equals("NNPS")) {
-                for (int j = 0; j < words.length; j++) {
-                    if (words[j][1].equals("VBZ")) {
-                        return j;
+            if(words[i][1].equalsIgnoreCase("VBZ")){
+                for (int j = i; j >0; j--){
+                    if(words[j][1].equalsIgnoreCase("NNS") || words[j][1].equalsIgnoreCase("NNPS")){
+                        return i;
+                    }
+                    else if(words[j][1].equalsIgnoreCase("NN") || words[j][1].equalsIgnoreCase("NNP")){
+                        return 0;
                     }
                 }
             }
             //you [is], [deserves], [plays]
-            if (words[i][1].equalsIgnoreCase("PRP") && (words[i][0].equalsIgnoreCase("they")
-                    || words[i][0].equalsIgnoreCase("you") || words[i][0].equalsIgnoreCase("those")
-                    || words[i][0].equalsIgnoreCase("these") /*|| words[i][0].equalsIgnoreCase("i")*/)) {
+            if ((words[i][1].equalsIgnoreCase("PRP") && (words[i][0].equalsIgnoreCase("they")
+                    || words[i][0].equalsIgnoreCase("you") || words[i][0].equalsIgnoreCase("we")) || words[i][0].equalsIgnoreCase("those")
+                    || words[i][0].equalsIgnoreCase("these") )) {
 
                 for (int j = i; j < words.length; j++) {
-                    if (words[j][1].equals("VBZ")) {
+                    if (words[j][1].equals("VBZ") || words[j][0].equalsIgnoreCase("am")) {
                         return j;
                     }
                 }
             }
-            if(words[i][1].equals("VBZ") && words[i][0].equalsIgnoreCase("is")){
+            if(words[0][1].equals("VBZ") && words[0][0].equalsIgnoreCase("is")){
                 for (int j = 0; j < words.length; j++) {
                     // is your [dogs]
                     if(words[j][1].contains("NNS")){
                         return j;
                     }
                     //[is] you tired, [is] you okay
-                    if(words[j][0].equalsIgnoreCase("you")){
+                    if(words[i][0].equalsIgnoreCase("you")){
                         for (int k = j; k < words.length; k ++)
                             if(!words[k][1].equals("NN")
                                     || !words[k][1].equals("NNS")
@@ -1004,7 +1048,7 @@ public class GrammarRules extends AppCompatActivity {
                 }
             }
             // starts with wh-question
-            if(words[i][1].equals("WRB") || words[i][1].equals("WP")){
+            if(words[0][1].equals("WRB") || words[0][1].equals("WP")){
                 //wh question is
                 if(words[i+1][0].equals("is")){
                     for (int j = 0; j < words.length; j++) {
@@ -1093,37 +1137,41 @@ public class GrammarRules extends AppCompatActivity {
             if ((words[i][1].equals("NN") || words[i][1].equals("NNP")) && !words[i][0].contains("'")) {
                 for (int j = 0; j < words.length; j++) {
                     if (words[j][1].equals("VBP")) {
+                        Log.wtf("Basic 1", "true");
                         return j;
                     }
                 }
             }
             // he [are], [deserve], [play]
-            if (words[i][1].equalsIgnoreCase("PRP") && (words[i][0].equalsIgnoreCase("he")
-                    || words[i][0].equalsIgnoreCase("she") || words[i][0].equalsIgnoreCase("it")
+            if ((words[i][1].equalsIgnoreCase("PRP") && (words[i][0].equalsIgnoreCase("he")
+                    || words[i][0].equalsIgnoreCase("she") || words[i][0].equalsIgnoreCase("it"))
                     || words[i][0].equalsIgnoreCase("this") || words[i][0].equalsIgnoreCase("that"))) {
 
                 for (int j = i; j < words.length; j++) {
                     if (words[j][1].equals("VBP")) {
+                        Log.wtf("Basic 2", "true");
                         return j;
                     }
                 }
             }
             // starts with are
-            if(words[i][1].equals("VBP") && words[i][0].equalsIgnoreCase("are")){
+            if(words[0][1].equals("VBP") && words[0][0].equalsIgnoreCase("are")){
                 for (int j = 0; j < words.length; j++) {
                     // are your [dog]
                     if(words[j][1].contains("NN")){
+                        Log.wtf("Basic 3", "true");
                         return j;
                     }
                 }
             }
             // starts with wh-question
-            if(words[i][1].equals("WRB") || words[i][1].equals("WP")) {
+            if(words[0][1].equals("WRB") || words[0][1].equals("WP")) {
                 // wh question are
                 if (words[i + 1][0].equals("are")) {
                     // error on how are your [dog]
                     for (int j = 0; j < words.length; j++) {
                         if (words[j][1].equals("NN")) {
+                            Log.wtf("Basic 4", "true");
                             return j;
                         }
                     }
@@ -1135,7 +1183,7 @@ public class GrammarRules extends AppCompatActivity {
     public static int BasicRulePronounSingular(String words[][]){
         for (int i = 0; i < words.length; i++) {
             // starts with is
-            if (words[i][1].equals("VBZ") && words[i][0].equalsIgnoreCase("is")) {
+            if (words[0][1].equals("VBZ") && words[0][0].equalsIgnoreCase("is")) {
                 for (int j = 0; j < words.length; j++) {
                     // is [they], is [those], is[these], is [you]
                     if(words[j][1].equals("PRP") && (words[j][0].equals("they") || words[j][0].equals("you"))
@@ -1174,7 +1222,7 @@ public class GrammarRules extends AppCompatActivity {
     public static int BasicRulePronounPlural(String words[][]){
         for (int i = 0; i < words.length; i ++) {
             // starts with are
-            if (words[i][1].equals("VBP") && words[i][0].equalsIgnoreCase("are")) {
+            if (words[0][1].equals("VBP") && words[0][0].equalsIgnoreCase("are")) {
                 for (int j = 0; j < words.length; j++) {
                     // are [that], are [this], are [he], are [she]
                     if (words[j][1].equals("PRP") && (words[j][0].equals("he") || words[j][0].equals("she") && words[j][0].equals("it"))
@@ -1185,7 +1233,7 @@ public class GrammarRules extends AppCompatActivity {
                 }
             }
             // starts with wh-question
-            if (words[i][1].equals("WRB") || words[i][1].equals("WP")) {
+            if (words[0][1].equals("WRB") || words[0][1].equals("WP")) {
                 // wh question are
                 if (words[i + 1][0].equals("are")) {
 
@@ -1227,26 +1275,43 @@ public class GrammarRules extends AppCompatActivity {
     public static ArrayList<String> PluralPos(String words[][]){
         int num = words.length;
         int errors[] = new int[num];
+        int temp = 0, ctr = 0;
         ArrayList<String> wordErrors = new ArrayList<String>();
         int k = 0;
-        if(getSentenceInput(words).contains("'")){
-            for (int i = 0; i < words.length-1; i++) {
-                if(words[i][0].contains("'")){
-                    if( !(words[i+1][1].contains("NN")) || words[i][0].contains("s's")) {
-                        //Log.wtf("warning", "panget gino " + i);
-                        wordErrors.add(words[i][0]);
-                        errors[k] = i;
-                    } else {
-                        wordErrors.clear();
-                        //Log.wtf("PLURPOS1", "NO ERROR");
-                        for (int l = 0; l < num; l++)
-                            errors[l] = -1;
-                    }
+        //if(getSentenceInput(words).contains("'")){
+        for (int i = 0; i < words.length-1; i++) {
+            if(words[i][0].contains("'")){
+                if( !(words[i+1][1].contains("NN")) || words[i][0].contains("s's")) {
+                    Log.wtf("warning", "panget gino " + i);
+                    temp++;
+                    ctr++;
+                    wordErrors.add(Integer.toString(ctr));
+                    wordErrors.add(words[i][0]);
+                    if(words[i][0].charAt(words[i][0].length() - 1) == 's')
+                        wordErrors.add(words[i][0] + "\'");
+                    else
+                        wordErrors.add(words[i][0] + "\'s");
+                    errors[k] = i;
                 }
-                k++;
             }
+            else {
+                Log.wtf("Plurpos", "no apos");
+                if ((words[i][1].equals("NNS") || words[i][1].equals("NNPS") || words[i][0].charAt(words[i][0].length() - 1) == 's') && words[i + 1][1].contains("NN")) {
+                    temp++;
+                    ctr++;
+                    wordErrors.add(Integer.toString(ctr));
+                    wordErrors.add(words[i][0]);
+                    if(words[i][0].charAt(words[i][0].length() - 1) == 's')
+                        wordErrors.add(words[i][0] + "\'");
+                    else
+                        wordErrors.add(words[i][0] + "\'s");
+                    errors[k] = i;
+                }
+            }
+            k++;
         }
-        else {
+        //}
+        if(temp == 0) {
             wordErrors.clear();
             //Log.wtf("PLURPOS3", "NO ERROR");
             for (int i = 0; i < num; i++)
@@ -1310,7 +1375,7 @@ public class GrammarRules extends AppCompatActivity {
         return verbErrors;
     }
 
-    public static int Fragments(String words[][], ArrayList<String> words1){
+    public static int Fragments(String words[][], ArrayList<String> words1, boolean isQuest){
         int nverb = 0;
         boolean frag = true;
         String[] storePhrase = new String[words1.size()];
@@ -1340,7 +1405,11 @@ public class GrammarRules extends AppCompatActivity {
                             words[j][1].equalsIgnoreCase("NNP") ||
                             words[j][1].equalsIgnoreCase("NNPS") ||
                             words[j][1].equalsIgnoreCase("PRP") ||
-                            words[j][1].equalsIgnoreCase("JJ") ){
+                            words[j][1].equalsIgnoreCase("JJ") ||
+                            words[j][0].equalsIgnoreCase("this") ||
+                            words[j][0].equalsIgnoreCase("that") ||
+                            words[j][0].equalsIgnoreCase("these") ||
+                            words[j][0].equalsIgnoreCase("those")){
                         frag = false;
                     }
                 }
@@ -1361,7 +1430,9 @@ public class GrammarRules extends AppCompatActivity {
                 return 1;
             }
         }
-
+        if(isQuest){
+            return 0;
+        }
         if(frag == true){
 
             return 1;

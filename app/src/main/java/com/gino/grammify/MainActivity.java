@@ -48,7 +48,7 @@ import java.net.URLConnection;
 import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener {
+        /*implements NavigationView.OnNavigationItemSelectedListener*/ {
 
     // Progress Dialog
     private ProgressDialog pDialog;
@@ -85,14 +85,14 @@ public class MainActivity extends AppCompatActivity
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
-                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
-        drawer.setDrawerListener(toggle);
-        toggle.syncState();
+        //DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        //ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
+        //        this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+        //drawer.setDrawerListener(toggle);
+        //toggle.syncState();
 
-        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
-        navigationView.setNavigationItemSelectedListener(this);
+        //NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+        //navigationView.setNavigationItemSelectedListener(this);
 
         button = (ImageButton) findViewById(R.id.imageButton);
         input = (EditText) findViewById(R.id.editText);
@@ -166,6 +166,7 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
+    /* DRAWER
     @Override
     public void onBackPressed() {
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -187,6 +188,7 @@ public class MainActivity extends AppCompatActivity
                 doubleBackToExitPressedOnce=false;
             }}, 2000);
     }
+    */
 
     /*@Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -210,6 +212,7 @@ public class MainActivity extends AppCompatActivity
         return super.onOptionsItemSelected(item);
     }
     */
+    /* DRAWER
     @SuppressWarnings("StatementWithEmptyBody")
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
@@ -225,28 +228,13 @@ public class MainActivity extends AppCompatActivity
             fragment = new MyFragment2();
         }
         fragmentManager.beginTransaction()
-                .replace(R.id.contentabout, fragment)
+                .replace(R.id.drawer_layout, fragment)
                 .commit();
-
-/*
-        if (id == R.id.nav_camera) {
-            // Handle the camera action
-        } else if (id == R.id.nav_gallery) {
-
-        } else if (id == R.id.nav_slideshow) {
-
-        } else if (id == R.id.nav_manage) {
-
-        } else if (id == R.id.nav_share) {
-
-        } else if (id == R.id.nav_send) {
-
-        }
-*/
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
     }
+
     public static class MyFragment1 extends Fragment {
         @Override
         public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -264,7 +252,7 @@ public class MainActivity extends AppCompatActivity
             return inflater.inflate(R.layout.content_about, container, false);
         }
     }
-
+*/
 
     public void VoiceInput(View view) {
         input.setEnabled(!input.isEnabled());

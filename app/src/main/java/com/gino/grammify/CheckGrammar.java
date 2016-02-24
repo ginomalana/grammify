@@ -212,6 +212,7 @@ public class CheckGrammar extends AppCompatActivity {
                         Log.wtf("START", Integer.toString(paragraph.indexOf(sentence.get(i)) + sentence.get(i).indexOf(suggst.get(j).get(2))));
                         Log.wtf("END", Integer.toString(paragraph.indexOf(sentence.get(i)) + sentence.get(i).indexOf(suggst.get(j).get(2)) + suggst.get(j).get(2).length()));
                         */
+                        /*
                         for (int k = 2; k < suggst.get(j).size(); k++) {
                             Log.wtf("SENTENCE", sentence.get(i));
                             Log.wtf("PARAGRAPH", paragraph);
@@ -222,6 +223,52 @@ public class CheckGrammar extends AppCompatActivity {
                                     paragraph.indexOf(sentence.get(i)) + sentence.get(i).indexOf(suggst.get(j).get(k)), //START
                                     paragraph.indexOf(sentence.get(i)) + sentence.get(i).indexOf(suggst.get(j).get(k)) + suggst.get(j).get(k).length(), //END
                                     Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                        }*/
+                        final int positionJ = j;
+
+                        //FIND WORD
+                        for (int k = 2; k < suggst.get(j).size(); k++) {
+                            Log.wtf("SENTENCE pp", sentence.get(i));
+                            Log.wtf("WORD pp", suggst.get(j).get(k));
+                            if (Character.isDigit((suggst.get(j).get(k)).charAt(0))) {
+                                Log.wtf("SentenceNum", Character.toString(suggst.get(j).get(k).charAt(0)));
+                                if (sentence.get(i).contains(suggst.get(j).get(k+1))) {
+                                    final String markedWord = suggst.get(j).get(k+1);
+                                    final int holdK = k+1;
+                                    Log.wtf("Marked word", markedWord);
+                                    ClickableSpan clickableSpan = new ClickableSpan() {
+                                        @Override
+                                        public void onClick(View textView) {
+                                            PopupMenu popup = new PopupMenu(CheckGrammar.this, textView);
+                                            popup.getMenuInflater().inflate(R.menu.popup_menu, popup.getMenu());
+                                            Log.wtf("# of Sugg", Integer.toString(suggst.get(positionJ).size()));
+                                            for (int l = holdK+1; l < ((ArrayList) suggst.get(positionJ)).size(); l++) {
+                                                if (Character.isDigit(suggst.get(positionJ).get(l).charAt(0)))
+                                                    break;
+                                                Log.wtf("Suggestion", suggst.get(positionJ).get(l));
+                                                popup.getMenu().add(l - 1, R.id.slot1, l - 1, suggst.get(positionJ).get(l));
+                                            }
+                                            popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+                                                public boolean onMenuItemClick(MenuItem item) {
+                                                    //Toast.makeText(CheckGrammar.this, "You Clicked : " + item.getTitle(), Toast.LENGTH_SHORT).show();
+                                                    for (int l = 0; l < suggst.size(); l++) {
+                                                        if (suggst.get(l).get(holdK).equals(markedWord))
+                                                            suggst.remove(l);
+                                                    }
+                                                    String replacement = sentence.get(positionI).replace(markedWord, item.getTitle().toString());
+                                                    SetSuggestion(suggst, paragraph.replace(sentence.get(positionI), replacement));
+                                                    return true;
+                                                }
+                                            });
+                                            popup.show();
+                                        }
+                                    };
+                                    ss.setSpan(clickableSpan,
+                                            paragraph.indexOf(sentence.get(i)) + sentence.get(i).indexOf(suggst.get(j).get(k+1)), //START
+                                            paragraph.indexOf(sentence.get(i)) + sentence.get(i).indexOf(suggst.get(j).get(k+1)) + suggst.get(j).get(k+1).length(), //END
+                                            Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+                                }
+                            }
                         }
                         errors[3]++;
                     }
@@ -276,6 +323,8 @@ public class CheckGrammar extends AppCompatActivity {
             textView2.setLinkTextColor(Color.GREEN);
         if (errors[5] > 0)
             textView2.setLinkTextColor(Color.BLUE);
+        if (errors[3] > 0)
+            textView2.setLinkTextColor(getResources().getColor(R.color.violet));
         textView2.setHighlightColor(Color.TRANSPARENT);
 
         String appendMark = "";
