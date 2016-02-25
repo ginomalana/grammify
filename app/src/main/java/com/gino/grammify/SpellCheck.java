@@ -25,6 +25,7 @@ public class SpellCheck {
     public static ArrayList<ArrayList<String>> corrections;
     public static ArrayList<String> wordList;
     public final String WHITESPACE = " ";
+    ArrayList<String> w;
 
     static boolean hasApos;
 
@@ -130,37 +131,25 @@ public class SpellCheck {
                     //Find correction
                     if (!wordFound) {
 
-                        //store distance
-                        ArrayList<String> w;
-                        /*
-                        //Store all distance from word
-                        dist = new ArrayList<Integer>();
-
-                        for (String wr: wordList) {
-                            //Log.wtf("MATCH", wr + " WORD: " + word);
-                            for (int x = 0; x < word.length(); x++) {
-                                if (word.length() > x && wr.length() > x) {
-                                    if (wr.charAt(x) == word.charAt(x)) {
-                                        dist.add(distance(wr.toCharArray(), word.toCharArray()));
-                                        break;
-                                    }
-                                }
-                            }
-                        }*/
-                        //Sort distance from word
-                        //Collections.sort(dist);
                         w = new ArrayList<String>();
-                        w.add(word);
 
 
-                        sb.append("[" + word + "]");
+                        if (wordCase) {
+                            sb.append("[" + Character.toUpperCase(word.charAt(0)) + word.substring(1) + "]");
+                            w.add(Character.toUpperCase(word.charAt(0)) + word.substring(1));
+                        }
+                        else {
+                            sb.append("[" + word + "]");
+                            w.add(word);
+                        }
 
                         for (String wr: wordList) {
                             for (int x = 0; x < word.length(); x++) {
+
                                 if (word.length() > x && wr.length() > x) {
                                     if (wr.charAt(x) == word.charAt(x)) {
-                                        //Log.wtf("DISTANCE", Boolean.toString(distance(wr.toCharArray(), word.toCharArray()) == dist.get(0)));
-                                        if (distance(wr.toCharArray(), word.toCharArray()) /*== dist.get(0)*/ <= 2 ) {
+                                        //if (distance(wr.toCharArray(), word.toCharArray()) /*== dist.get(0)*/ <= 1 ) {
+                                        if (new DamerauLevenshtein(wr,word).getSimilarity() <= 1) {
                                             String sugg;
                                             if (wordCase && hasApos)
                                                 sugg = Character.toUpperCase(wr.charAt(0)) + wr.substring(1) + apos;
@@ -173,9 +162,10 @@ public class SpellCheck {
 
                                             if (punctuation != ' ')
                                                 sugg += punctuation;
+                                            Log.wtf("SUGG", sugg);
                                             w.add(sugg);
+                                            break;
                                         }
-                                        break;
                                     }
                                 }
                             }
