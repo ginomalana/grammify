@@ -54,7 +54,12 @@ public class POSTagger {
         }
     }
 
-    public static void chunk(String paragraph) throws IOException {
+    public void chunk(String paragraph) throws IOException {
+
+        //Reload model if coming from application crash
+        if (model == null || model2 == null)
+            new LoadModel().execute();
+
         PerformanceMonitor perfMon = new PerformanceMonitor(System.err, "sent");
         POSTaggerME tagger = new POSTaggerME(model);
         ChunkerME chunkerME = new ChunkerME(model2);

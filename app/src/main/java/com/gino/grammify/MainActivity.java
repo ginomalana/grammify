@@ -10,6 +10,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.content.res.AssetManager;
 import android.graphics.Typeface;
 import android.os.AsyncTask;
 import android.os.Build;
@@ -41,6 +42,7 @@ import android.text.TextWatcher;
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URL;
@@ -102,52 +104,11 @@ public class MainActivity extends AppCompatActivity
 
         input.setTypeface(face);
 
-        //Check if directory exists
-        String folder = Environment.getExternalStorageDirectory()
-                + "/Android/data/com.thesis.grammify/resources";
-        File dir = new File(folder + "/resources.bin");
-        File dir2 = new File(folder + "/resources2.bin");
-
-        if (!dir.exists() || !dir.exists()) {
-            new File(folder).mkdirs();
-            new DownloadFileFromURL().execute();
-
-        }
-        final EditText editText = (EditText)findViewById(R.id.editText);
-        final TextView wordCount = (TextView) findViewById(R.id.textView6);
-
         //TEMP
         topLevelLayout = findViewById(R.id.top_layout);
         if (isFirstTime()) {
             topLevelLayout.setVisibility(View.INVISIBLE);
         }
-        //TEMP
-        /*
-        final TextWatcher txwatcher = new TextWatcher() {
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-            }
-
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-                if (s.toString().contains(" ")) {
-                    String[] arr = s.toString().split("\\s");
-                    if (arr.length > 50) {
-                        String text ="";
-                        for (int x = 0; x < 50; x++)
-                            text += text + " ";
-
-                        editText.setText(text);
-                    }
-                    wordCount.setText("Words: " + arr.length);
-                }
-                else
-                    wordCount.setText("Words: 0");
-            }
-
-            public void afterTextChanged(Editable s) {
-            }
-        };
-        editText.addTextChangedListener(txwatcher);
-*/
     }
 
     //MARSHMALLOW PERMISSION
@@ -339,94 +300,6 @@ public class MainActivity extends AppCompatActivity
 
     public String GetText() {
         return sentence;
-    }
-
-
-    /**
-     * Downloading Dialog
-     */
-
-    @Override
-    protected Dialog onCreateDialog(int id) {
-        switch (id) {
-            case progress_bar_type: // we set this to 0
-                pDialog = new ProgressDialog(this);
-                pDialog.setMessage("Downloading offline resources. Please wait...");
-                pDialog.setCancelable(true);
-                pDialog.show();
-                return pDialog;
-            default:
-                return null;
-        }
-    }
-
-    /**
-     * Background Async Task to download file
-     */
-    class DownloadFileFromURL extends AsyncTask<String, String, String> {
-        /**
-         * Before starting background thread Show Progress Bar Dialog
-         */
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-            showDialog(progress_bar_type);
-        }
-
-        /**
-         * Downloading file in background thread
-         */
-        @Override
-        protected String doInBackground(String... f_url) {
-
-            try {
-                downloadFile(file_url, "resources");
-                downloadFile(file_url2, "resources2");
-            } catch (Exception e) {
-                Log.e("Error: ", e.getMessage());
-            }
-
-            return null;
-        }
-
-        /**
-         * After completing background task Dismiss the progress dialog
-         **/
-        @Override
-        protected void onPostExecute(String file_url) {
-            // dismiss the dialog after the file was downloaded
-            dismissDialog(progress_bar_type);
-
-        }
-
-        public void downloadFile(String fl_url, String file_name) throws Exception {
-            int count;
-            URL url = new URL(fl_url);
-            URLConnection urlCon = url.openConnection();
-            urlCon.connect();
-
-            // download the file
-            InputStream input = new BufferedInputStream(url.openStream(),
-                    8192);
-            OutputStream output = new FileOutputStream(Environment
-                    .getExternalStorageDirectory().toString()
-                    + "/Android/data/com.thesis.grammify/resources/" + file_name + ".bin");
-
-            byte data[] = new byte[1024];
-
-            while ((count = input.read(data)) != -1) {
-                // writing data to file
-                output.write(data, 0, count);
-            }
-
-            // flushing output
-            output.flush();
-
-            // closing streams
-            output.close();
-            input.close();
-        }
-
     }
 
     private boolean isFirstTime()
