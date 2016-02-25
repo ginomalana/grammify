@@ -571,7 +571,9 @@ public class GrammarRules extends AppCompatActivity {
             sntnc = sb.toString();
         }
         for (int i = 0; i < suggestions.size(); i++){
-            for (int j = 0; j < suggestions.get(i).size(); j++) {
+            Log.wtf("Output", suggestions.get(i).get(0) + " sentence");
+            Log.wtf("Output", suggestions.get(i).get(1) + " color");
+            for (int j = 2; j < suggestions.get(i).size(); j++) {
                 Log.wtf("Output", suggestions.get(i).get(j));
             }
         }

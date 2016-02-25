@@ -84,12 +84,9 @@ public class CheckGrammar extends AppCompatActivity {
 
         try {
             //startDialog(sentence);
-            SpellCheck sc = new SpellCheck(sentence, context);
-            sentence = SpellCheck.getString();
-            CorrectWords(sentence);
-            sentence = SpellCheck.getString();
+            new BackgroundCheckWord().execute();
         } catch (Exception e) {
-            Log.wtf("EXCEPTION: ", e.toString());
+            Log.wtf("SpellCheck Exception ", e.toString());
         }
 
         coloredText = new ArrayList<ArrayList<Integer>>();
@@ -555,7 +552,7 @@ public class CheckGrammar extends AppCompatActivity {
         switch (id) {
             case progress_bar_type: // we set this to 0
                 pDialog = new ProgressDialog(this);
-                pDialog.setMessage("Checking Grammar...");
+                pDialog.setMessage("Checking Spelling...");
                 pDialog.setCancelable(false);
                 pDialog.show();
                 return pDialog;
@@ -564,8 +561,37 @@ public class CheckGrammar extends AppCompatActivity {
         }
     }
 
+    //Background task Spell Check
+    private class BackgroundCheckWord extends AsyncTask<String,String,String> {
 
-    //Background Task
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            showDialog(progress_bar_type);
+        }
+
+        @Override
+        protected String doInBackground(String...word) {
+            //try {
+                sc = new SpellCheck(sentence, context);
+            //} catch (Exception e) {
+            //    Log.wtf("SpellCheck Exception", e.toString());
+            //}
+
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(String word) {
+            dismissDialog(progress_bar_type);
+            sentence = sc.getString();
+            CorrectWords(sentence);
+            sentence = sc.getString();
+        }
+    }
+
+
+    //Background Task POS TAGGER
     private class BackgroundTagger extends AsyncTask {
 
         @Override
@@ -576,8 +602,6 @@ public class CheckGrammar extends AppCompatActivity {
 
         @Override
         protected Object doInBackground(Object[] params) {
-
-            SpellCheck spc = new SpellCheck();
             try {
                 pst = new POSTagger(SpellCheck.getString());
             } catch (Exception e) {
@@ -591,8 +615,6 @@ public class CheckGrammar extends AppCompatActivity {
         protected void onPostExecute(Object o) {
             super.onPostExecute(o);
             dismissDialog(progress_bar_type);
-            TextView textView2 = (TextView) findViewById(R.id.textView2);
-            SpellCheck spellCheck = new SpellCheck();
             GrammarRules gr = new GrammarRules(pst.GetTags(), pst.getChunk());
             SetSuggestion(gr.GetSuggestion(), gr.GetSentence());
         }

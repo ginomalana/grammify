@@ -26,9 +26,6 @@ public class LaunchScreenActivity extends AppCompatActivity {
         //Check if resources.bin & resources2.bin exists in /sdcard
         CheckFile();
 
-        //Load words
-        new SpellCheck(getApplicationContext());
-
         //Exit splash screen
         new BackgroundTask().execute();
 
@@ -100,6 +97,10 @@ public class LaunchScreenActivity extends AppCompatActivity {
 
         @Override
         protected Object doInBackground(Object[] params) {
+            try {
+                Thread.sleep(1500);
+            } catch (Exception e) {
+            }
             return null;
         }
 

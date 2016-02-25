@@ -56,9 +56,8 @@ public class POSTagger {
 
     public void chunk(String paragraph) throws IOException {
 
-        //Reload model if coming from application crash
-        if (model == null || model2 == null)
-            new LoadModel().execute();
+        Log.wtf("model1", model.toString());
+        Log.wtf("model2", model2.toString());
 
         PerformanceMonitor perfMon = new PerformanceMonitor(System.err, "sent");
         POSTaggerME tagger = new POSTaggerME(model);
