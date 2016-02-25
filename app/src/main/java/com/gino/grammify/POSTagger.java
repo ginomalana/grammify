@@ -114,10 +114,6 @@ public class POSTagger {
 
             chunk.add(chunkPerSentence);
         }
-        Log.wtf("FINAL OUTPUT: ", posTag.toString());
-        for (int x = 0; x < chunk.size(); x++) {
-            Log.wtf("Chunkify", chunk.get(x).toString());
-        }
     }
 
     public String GetTags(){

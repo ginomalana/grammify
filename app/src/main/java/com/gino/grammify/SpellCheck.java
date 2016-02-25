@@ -50,15 +50,7 @@ public class SpellCheck {
         }
         Log.wtf("After Contraction", message);
         words = message.split(WHITESPACE);
-        /*String tempWord = "";
-        for (char wrd: words[words.length-1].toCharArray()){
-            Log.wtf("WORD: ", Character.toString(wrd));
-            if (Character.isLetter(wrd))
-                tempWord += wrd;
-            Log.wtf("TEMP WORD??", tempWord);
-        }
-        Log.wtf("TEMP WORD??", tempWord);
-        words[words.length-1] = tempWord;*/
+
 
 
         int ctr = 0;
@@ -66,7 +58,7 @@ public class SpellCheck {
             ctr++;
             char punctuation = ' ';
             hasApos = false;
-            String apos = "";
+            String apostrophe = "";
             if (!Character.isDigit(word.charAt(0))) {
                 //Check for word case
                 boolean wordCase = Character.isUpperCase(word.charAt(0));
@@ -76,12 +68,12 @@ public class SpellCheck {
                     boolean yes = false;
                     for (Character s: word.toCharArray()) {
                         if (s.equals('\'')) {
-                            apos += s;
+                            apostrophe  += s;
                             yes = true;
                         }
                         else {
                             if (yes)
-                                apos += s;
+                                apostrophe  += s;
                             else
                                 wrd += s;
                         }
@@ -92,7 +84,7 @@ public class SpellCheck {
 
                 if (wordCase && ctr > 1) {
                     if (hasApos)
-                        sb.append(word + apos);
+                        sb.append(word + apostrophe );
                     else
                         sb.append(word);
                 } else {
@@ -105,17 +97,18 @@ public class SpellCheck {
                     if (pattern.contains(Character.toString(word.charAt(word.length() - 1)))) {
                         punctuation = word.charAt(word.length() - 1);
                         word = word.substring(0, word.length() - 1);
+                        ctr = 0;
                     }
 
                     //find word
                     for (String wr: wordList) {
                         if (wr.equals(word)) {
                             if (wordCase && hasApos)
-                                sb.append(Character.toUpperCase(word.charAt(0)) + (word.substring(1)) + apos);
+                                sb.append(Character.toUpperCase(word.charAt(0)) + (word.substring(1)) + apostrophe );
                             else if (wordCase)
                                 sb.append(Character.toUpperCase(word.charAt(0)) + (word.substring(1)));
                             else if (hasApos)
-                                sb.append(word + apos);
+                                sb.append(word + apostrophe );
                             else
                                 sb.append(word);
 
@@ -133,35 +126,32 @@ public class SpellCheck {
 
                         w = new ArrayList<String>();
 
-
                         if (wordCase) {
                             sb.append("[" + Character.toUpperCase(word.charAt(0)) + word.substring(1) + "]");
                             w.add(Character.toUpperCase(word.charAt(0)) + word.substring(1));
-                        }
-                        else {
+                        } else {
                             sb.append("[" + word + "]");
                             w.add(word);
                         }
 
+                        if (punctuation != ' ')
+                            sb.append(punctuation);
+
                         for (String wr: wordList) {
                             for (int x = 0; x < word.length(); x++) {
-
                                 if (word.length() > x && wr.length() > x) {
                                     if (wr.charAt(x) == word.charAt(x)) {
                                         //if (distance(wr.toCharArray(), word.toCharArray()) /*== dist.get(0)*/ <= 1 ) {
                                         if (new DamerauLevenshtein(wr,word).getSimilarity() <= 1) {
                                             String sugg;
                                             if (wordCase && hasApos)
-                                                sugg = Character.toUpperCase(wr.charAt(0)) + wr.substring(1) + apos;
+                                                sugg = Character.toUpperCase(wr.charAt(0)) + wr.substring(1) + apostrophe ;
                                             else if (wordCase)
                                                 sugg = Character.toUpperCase(wr.charAt(0)) + wr.substring(1);
                                             else if (hasApos)
-                                                sugg = wr + apos;
+                                                sugg = wr + apostrophe ;
                                             else
                                                 sugg = wr;
-
-                                            if (punctuation != ' ')
-                                                sugg += punctuation;
                                             Log.wtf("SUGG", sugg);
                                             w.add(sugg);
                                             break;

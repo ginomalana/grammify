@@ -52,18 +52,12 @@ import java.util.ArrayList;
 public class MainActivity extends AppCompatActivity
         /*implements NavigationView.OnNavigationItemSelectedListener*/ {
 
-    // Progress Dialog
-    private ProgressDialog pDialog;
-    public static final int progress_bar_type = 0;
-
     boolean doubleBackToExitPressedOnce = false;
 
     /**
      * File url to download
      * resources.bin
      */
-    private static String file_url = "https://docs.google.com/uc?id=0B6wkFq-lyI4kT3VjcUhkNm1KaTA&export=download";
-    private static String file_url2 = "https://docs.google.com/uc?id=0B6wkFq-lyI4kQ29SdHFOTXZhOGM&export=download";
 
     static String sentence;
     private EditText input;
@@ -127,14 +121,17 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
-    /* DRAWER
+
     @Override
     public void onBackPressed() {
+        /*DRAWER
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         }
+
         else {
+        */
             if (doubleBackToExitPressedOnce) {
                 super.onBackPressed();
                 return;
@@ -142,14 +139,14 @@ public class MainActivity extends AppCompatActivity
             this.doubleBackToExitPressedOnce = true;
             Toast.makeText(this, "Please click BACK again to exit", Toast.LENGTH_SHORT).show();
 
-        }
+        //}
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
                 doubleBackToExitPressedOnce=false;
             }}, 2000);
     }
-    */
+
 
     /*@Override
     public boolean onCreateOptionsMenu(Menu menu) {
