@@ -69,7 +69,7 @@ public class POSTagger {
             ArrayList<String> puncAndWord = new ArrayList<String>();
             //Sentence
             puncAndWord.add(sentenceSplit.group()
-                    .replaceAll("[^a-zA-Z'\\s]", "")
+                    .replaceAll("[^a-zA-Z1-9'\\s]", "")
                     .replaceAll("\\s+", " "));
             //Punctuation
             puncAndWord.add(Character.toString(paragraph.charAt(sentenceSplit.end() - 1)));

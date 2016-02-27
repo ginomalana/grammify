@@ -106,7 +106,7 @@ public class CheckGrammar extends AppCompatActivity {
         while (sentenceSplit.find()) {
             //Sentence
             sentence.add(sentenceSplit.group()
-                    .replaceAll("[^a-zA-Z'\\s]", "")
+                    .replaceAll("[^a-zA-Z1-9'\\s]", "")
                     .replaceAll("\\s+", " ") +
                     // punctuation
                     Character.toString(paragraph.charAt(sentenceSplit.end() - 1)));
@@ -219,10 +219,12 @@ public class CheckGrammar extends AppCompatActivity {
                                                 Log.wtf("Click", "clicked");
                                                 //Toast.makeText(CheckGrammar.this, "You Clicked : " + item.getTitle(), Toast.LENGTH_SHORT).show();
                                                 Log.wtf("Marked", markedWord);
-                                                for (int l = 0; l < suggst.size(); l++) {
-                                                    Log.wtf("Click", suggst.get(l).get(2));
-                                                    if (suggst.get(l).get(2).equals(markedWord))
-                                                        suggst.remove(l);
+                                                if (!suggst.isEmpty()) {
+                                                    for (int l = 0; l < suggst.size(); l++) {
+                                                        Log.wtf("Click", suggst.get(l).get(2));
+                                                        if (suggst.get(l).get(2).equals(markedWord))
+                                                            suggst.remove(l);
+                                                    }
                                                 }
                                                 String replacement = sentence.get(positionI).replace(markedWord, item.getTitle().toString());
                                                 SetSuggestion(suggst, paragraph.replace(sentence.get(positionI), replacement));
