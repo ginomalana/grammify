@@ -1,11 +1,13 @@
 package com.gino.grammify;
 
+import android.annotation.TargetApi;
 import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -80,11 +82,8 @@ public class CheckGrammar extends AppCompatActivity {
         });
         //TEMP
 
-
-
         try {
-            //startDialog(sentence);
-            new BackgroundCheckWord().execute();
+            new BackgroundCheckWord().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, null);
         } catch (Exception e) {
             Log.wtf("SpellCheck Exception ", e.toString());
         }
@@ -114,7 +113,7 @@ public class CheckGrammar extends AppCompatActivity {
         }
 
         Log.wtf("Complete Sentence", paragraph);
-        Log.wtf("# of sentence", Integer.toString(sentence.size()));
+        Log.wtf("# of sentence/s", Integer.toString(sentence.size()));
         final SpannableString ss = new SpannableString(paragraph);
         for (int i = 0; i < sentence.size(); i++) {
             final int positionI = i;
@@ -183,12 +182,6 @@ public class CheckGrammar extends AppCompatActivity {
                         errors[4]++;
                     }
                     else if (Integer.parseInt(suggst.get(j).get(1)) == 3) { // VERB TENSE
-                        /*
-                        ss.setSpan(new ForegroundColorSpan(getResources().getColor(R.color.pink)),
-                                paragraph.indexOf(sentence.get(i)), //START
-                                paragraph.indexOf(sentence.get(i)) + sentence.get(i).length(), //END
-                                Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-                                */
                         for (int k = 2; k < suggst.get(j).size(); k++) {
                             Log.wtf("SENTENCE", sentence.get(i));
                             Log.wtf("PARAGRAPH", paragraph);
@@ -203,73 +196,51 @@ public class CheckGrammar extends AppCompatActivity {
                         errors[2]++;
                     }
                     else if (Integer.parseInt(suggst.get(j).get(1)) == 4) { // PLURAL AND POSSESIVE
-                        /*Log.wtf("HIGHLIGHT", suggst.get(j).get(2));
-                        Log.wtf("SENTENCE", sentence.get(i));
-                        Log.wtf("PARAGRAPH", paragraph);
-                        Log.wtf("START", Integer.toString(paragraph.indexOf(sentence.get(i)) + sentence.get(i).indexOf(suggst.get(j).get(2))));
-                        Log.wtf("END", Integer.toString(paragraph.indexOf(sentence.get(i)) + sentence.get(i).indexOf(suggst.get(j).get(2)) + suggst.get(j).get(2).length()));
-                        */
-                        /*
-                        for (int k = 2; k < suggst.get(j).size(); k++) {
-                            Log.wtf("SENTENCE", sentence.get(i));
-                            Log.wtf("PARAGRAPH", paragraph);
-                            Log.wtf("START", Integer.toString(paragraph.indexOf(sentence.get(i)) + sentence.get(i).indexOf(suggst.get(j).get(k))));
-                            Log.wtf("END", Integer.toString(paragraph.indexOf(sentence.get(i)) + sentence.get(i).indexOf(suggst.get(j).get(k)) + suggst.get(j).get(k).length()));
-
-                            ss.setSpan(new ForegroundColorSpan(getResources().getColor(R.color.violet)),
-                                    paragraph.indexOf(sentence.get(i)) + sentence.get(i).indexOf(suggst.get(j).get(k)), //START
-                                    paragraph.indexOf(sentence.get(i)) + sentence.get(i).indexOf(suggst.get(j).get(k)) + suggst.get(j).get(k).length(), //END
-                                    Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-                        }*/
                         final int positionJ = j;
-
                         //FIND WORD
-                        for (int k = 2; k < suggst.get(j).size(); k++) {
-                            Log.wtf("SENTENCE pp", sentence.get(i));
-                            Log.wtf("WORD pp", suggst.get(j).get(k));
-                            if (Character.isDigit((suggst.get(j).get(k)).charAt(0))) {
-                                Log.wtf("SentenceNum", Character.toString(suggst.get(j).get(k).charAt(0)));
-                                if (sentence.get(i).contains(suggst.get(j).get(k+1))) {
-                                    final String markedWord = suggst.get(j).get(k+1);
-                                    final int holdK = k+1;
-                                    Log.wtf("Marked word", markedWord);
-                                    ClickableSpan clickableSpan = new ClickableSpan() {
-                                        @Override
-                                        public void onClick(View textView) {
-                                            PopupMenu popup = new PopupMenu(CheckGrammar.this, textView);
-                                            popup.getMenuInflater().inflate(R.menu.popup_menu, popup.getMenu());
-                                            Log.wtf("# of Sugg", Integer.toString(suggst.get(positionJ).size()));
-                                            for (int l = holdK+1; l < ((ArrayList) suggst.get(positionJ)).size(); l++) {
-                                                if (Character.isDigit(suggst.get(positionJ).get(l).charAt(0)))
-                                                    break;
-                                                Log.wtf("Suggestion", suggst.get(positionJ).get(l));
-                                                popup.getMenu().add(l - 1, R.id.slot1, l - 1, suggst.get(positionJ).get(l));
-                                            }
-                                            popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
-                                                public boolean onMenuItemClick(MenuItem item) {
-                                                    //Toast.makeText(CheckGrammar.this, "You Clicked : " + item.getTitle(), Toast.LENGTH_SHORT).show();
-                                                    for (int l = 0; l < suggst.size(); l++) {
-                                                        if (suggst.get(l).get(holdK).equals(markedWord))
-                                                            suggst.remove(l);
-                                                    }
-                                                    String replacement = sentence.get(positionI).replace(markedWord, item.getTitle().toString());
-                                                    SetSuggestion(suggst, paragraph.replace(sentence.get(positionI), replacement));
-                                                    return true;
-                                                }
-                                            });
-                                            popup.show();
+                        for (int k = 0; k < suggst.get(j).size(); k++) {
+                            Log.wtf("SENTENCE", sentence.get(i));
+                            Log.wtf("WORD", suggst.get(j).get(2));
+                            if (sentence.get(i).contains(suggst.get(j).get(2))) {
+                                final String markedWord = suggst.get(j).get(2);
+                                Log.wtf("Marked word", markedWord);
+                                ClickableSpan clickableSpan = new ClickableSpan() {
+                                    @Override
+                                    public void onClick(View textView) {
+                                        PopupMenu popup = new PopupMenu(CheckGrammar.this, textView);
+                                        popup.getMenuInflater().inflate(R.menu.popup_menu, popup.getMenu());
+                                        Log.wtf("# of Sugg", Integer.toString(suggst.get(positionJ).size()));
+                                        for (int k = 3; k < ((ArrayList) suggst.get(positionJ)).size(); k++) {
+                                            Log.wtf("Suggestion", suggst.get(positionJ).get(k));
+                                            popup.getMenu().add(k - 2, R.id.slot1, k - 2, suggst.get(positionJ).get(k));
                                         }
-                                    };
-                                    ss.setSpan(clickableSpan,
-                                            paragraph.indexOf(sentence.get(i)) + sentence.get(i).indexOf(suggst.get(j).get(k+1)), //START
-                                            paragraph.indexOf(sentence.get(i)) + sentence.get(i).indexOf(suggst.get(j).get(k+1)) + suggst.get(j).get(k+1).length(), //END
-                                            Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
-                                }
+                                        popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+                                            public boolean onMenuItemClick(MenuItem item) {
+                                                Log.wtf("Click", "clicked");
+                                                //Toast.makeText(CheckGrammar.this, "You Clicked : " + item.getTitle(), Toast.LENGTH_SHORT).show();
+                                                Log.wtf("Marked", markedWord);
+                                                for (int l = 0; l < suggst.size(); l++) {
+                                                    Log.wtf("Click", suggst.get(l).get(2));
+                                                    if (suggst.get(l).get(2).equals(markedWord))
+                                                        suggst.remove(l);
+                                                }
+                                                String replacement = sentence.get(positionI).replace(markedWord, item.getTitle().toString());
+                                                SetSuggestion(suggst, paragraph.replace(sentence.get(positionI), replacement));
+                                                return true;
+                                            }
+                                        });
+                                        popup.show();
+                                    }
+                                };
+                                ss.setSpan(clickableSpan,
+                                        paragraph.indexOf(sentence.get(i)) + sentence.get(i).indexOf(suggst.get(j).get(2)), //START
+                                        paragraph.indexOf(sentence.get(i)) + sentence.get(i).indexOf(suggst.get(j).get(2)) + suggst.get(j).get(2).length(), //END
+                                        Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
                             }
                         }
                         errors[3]++;
                     }
-                    else if (Integer.parseInt(suggst.get(j).get(1)) == 5) { // S/V AGREEMENT
+                    else if (Integer.parseInt(suggst.get(j).get(1)) == 5) { // PRONOUN AGREEMENT
                         final int positionJ = j;
                         //FIND WORD
                         for (int k = 0; k < suggst.get(j).size(); k++) {
@@ -573,7 +544,7 @@ public class CheckGrammar extends AppCompatActivity {
         @Override
         protected String doInBackground(String...word) {
             //try {
-                sc = new SpellCheck(sentence, context);
+                sc = new SpellCheck(sentence);
             //} catch (Exception e) {
             //    Log.wtf("SpellCheck Exception", e.toString());
             //}

@@ -31,13 +31,10 @@ public class POSTagger {
     static POSModel model;
     static ChunkerModel model2;
 
-    static int ctrModel = 0;
-
     static StringBuilder posTag;
     static ArrayList<ArrayList<String>> chunk;
 
     public POSTagger() {
-        if (ctrModel++ < 1 )
             new LoadModel().execute();
     }
 
@@ -55,9 +52,6 @@ public class POSTagger {
     }
 
     public void chunk(String paragraph) throws IOException {
-
-        Log.wtf("model1", model.toString());
-        Log.wtf("model2", model2.toString());
 
         PerformanceMonitor perfMon = new PerformanceMonitor(System.err, "sent");
         POSTaggerME tagger = new POSTaggerME(model);

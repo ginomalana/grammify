@@ -23,11 +23,11 @@ public class SpellCheck {
 
     }
 
-    public SpellCheck(String message, Context context) {
-
+    public SpellCheck (String source, Context context) {
+        Log.wtf("Words", "Loading");
         //Store words to arraylist
         try {
-            in = new BufferedReader(new InputStreamReader(context.getAssets().open("enable1.txt"), "UTF-8"));
+            in = new BufferedReader(new InputStreamReader(context.getAssets().open(source), "UTF-8"));
             wordList = new ArrayList<String>();
             String line;
             while ((line = in.readLine()) != null)
@@ -35,8 +35,10 @@ public class SpellCheck {
         } catch (Exception e) {
             Log.wtf("Exception Words", e.toString());
         }
+        Log.wtf("Words", "Loaded");
+    }
 
-
+    public SpellCheck(String message) {
 
         corrections = new ArrayList<ArrayList<String>>();
         sb = new StringBuffer("");

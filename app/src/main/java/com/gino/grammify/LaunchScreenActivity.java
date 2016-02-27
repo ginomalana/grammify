@@ -23,14 +23,18 @@ public class LaunchScreenActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        new SpellCheck("enable1.txt", getApplicationContext());
+
         //Check if resources.bin & resources2.bin exists in /sdcard
         CheckFile();
 
-        //Exit splash screen
-        new BackgroundTask().execute();
-
         //Load resources.bin & resources2.bin
         new POSTagger();
+
+        //Exit splash screen
+        new BackgroundTask().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, null);
+
+
     }
 
     public void CheckFile() {
@@ -98,9 +102,8 @@ public class LaunchScreenActivity extends AppCompatActivity {
         @Override
         protected Object doInBackground(Object[] params) {
             try {
-                Thread.sleep(1500);
-            } catch (Exception e) {
-            }
+                Thread.sleep(1000);
+            } catch (Exception e) { }
             return null;
         }
 

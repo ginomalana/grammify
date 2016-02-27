@@ -36,7 +36,7 @@ public class GrammarRules extends AppCompatActivity {
         int hold = 0;
         suggestions = new ArrayList<ArrayList<String>>();
         StringBuffer sb = new StringBuffer("");
-        Log.wtf("TAGGED WORDS: ", taggedWords);
+        Log.wtf("TAGGED MESSAGE: ", taggedWords);
         errorOccur = 0;
         //Sentence Tokenization
         ArrayList<String> sentence = new ArrayList<String>();
@@ -107,13 +107,9 @@ public class GrammarRules extends AppCompatActivity {
             sb.append(words[words.length - 1][0] + SetPunctuation(words) + " ");
 
             sntnc = sb.toString();
-            Log.wtf("SNTC CONCAT", sntnc);
+            //Log.wtf("SNTC CONCAT", sntnc);
             int ctr = 0;
             //output
-
-            for (int p = 0; p < chunk.get(x).size(); p++) {
-                Log.wtf("Chunk in rules", chunk.get(x).get(p).toString());
-            }
 
             //Verb-Change
             int ruleOne = RuleOne(words);
@@ -515,17 +511,9 @@ public class GrammarRules extends AppCompatActivity {
                 //  }
                 //  if(plurPos)
                 //      sb.append("\nPlural & Possessive Rule Error");
-                if(!PluralPos(words).isEmpty()) {
-                    ArrayList ruleList = new ArrayList<String>();
-                    ruleList.add(Integer.toString(x));
-                    ruleList.add("4"); ////COLOR
-
-                    ArrayList<String> highlight = PluralPos(words);
-                    ruleList.addAll(highlight);
-
-
-                    suggestions.add(ruleList);
-
+                if(!PluralPos(words,x).isEmpty()) {
+                    for (ArrayList<String> ruleList: PluralPos(words, x))
+                        suggestions.add(ruleList);
                 }
                 if (!VerbTense(words).isEmpty()) {
                     ArrayList ruleList = new ArrayList<String>();
@@ -1274,11 +1262,12 @@ public class GrammarRules extends AppCompatActivity {
     }
 
     ///what if 2 errors in 1 sentence
-    public static ArrayList<String> PluralPos(String words[][]){
+    public static ArrayList<ArrayList<String>> PluralPos(String words[][], int x){
+        ArrayList<ArrayList<String>> sugg = new ArrayList<ArrayList<String>>();
         int num = words.length;
         int errors[] = new int[num];
         int temp = 0, ctr = 0;
-        ArrayList<String> wordErrors = new ArrayList<String>();
+        ArrayList<String> wordErrors;
         int k = 0;
         //if(getSentenceInput(words).contains("'")){
         for (int i = 0; i < words.length-1; i++) {
@@ -1287,13 +1276,17 @@ public class GrammarRules extends AppCompatActivity {
                     Log.wtf("warning", "panget gino " + i);
                     temp++;
                     ctr++;
-                    wordErrors.add(Integer.toString(ctr));
+                    //wordErrors.add(Integer.toString(ctr));
+                    wordErrors = new ArrayList<String>();
+                    wordErrors.add(Integer.toString(x));
+                    wordErrors.add("4"); ////COLOR
                     wordErrors.add(words[i][0]);
                     if(words[i][0].charAt(words[i][0].length() - 1) == 's')
                         wordErrors.add(words[i][0] + "\'");
                     else
                         wordErrors.add(words[i][0] + "\'s");
                     errors[k] = i;
+                    sugg.add(wordErrors);
                 }
             }
             else {
@@ -1301,25 +1294,28 @@ public class GrammarRules extends AppCompatActivity {
                 if ((words[i][1].equals("NNS") || words[i][1].equals("NNPS") || words[i][0].charAt(words[i][0].length() - 1) == 's') && words[i + 1][1].contains("NN")) {
                     temp++;
                     ctr++;
-                    wordErrors.add(Integer.toString(ctr));
+                    wordErrors = new ArrayList<String>();
+                    wordErrors.add(Integer.toString(x));
+                    wordErrors.add("4");
                     wordErrors.add(words[i][0]);
                     if(words[i][0].charAt(words[i][0].length() - 1) == 's')
                         wordErrors.add(words[i][0] + "\'");
                     else
                         wordErrors.add(words[i][0] + "\'s");
                     errors[k] = i;
+                    sugg.add(wordErrors);
                 }
             }
             k++;
         }
         //}
         if(temp == 0) {
-            wordErrors.clear();
+            //wordErrors.clear();
             //Log.wtf("PLURPOS3", "NO ERROR");
             for (int i = 0; i < num; i++)
                 errors[i] = -1;
         }
-        return wordErrors;
+        return sugg;
     }
 
     public static ArrayList<String> VerbTense(String words[][]){
