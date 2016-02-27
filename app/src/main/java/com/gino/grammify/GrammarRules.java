@@ -68,6 +68,12 @@ public class GrammarRules extends AppCompatActivity {
                 if(words[i][0].equalsIgnoreCase("am")){
                     words[i][1] = "VBP";
                 }
+                if(words[i][0].equalsIgnoreCase("was")){
+                    words[i][1] = "VBDZ";
+                }
+                if(words[i][0].equalsIgnoreCase("were")){
+                    words[i][1] = "VBDP";
+                }
                 //words[i][1] = wordAndTag[1].equals("were")? "VBP": "VBZ";
                 Log.wtf("Word", words[i][0] + "\tTag: " + words[i][1]);
             }
@@ -617,7 +623,7 @@ public class GrammarRules extends AppCompatActivity {
             if(getTagsInput(words).contains("CC")){
                 errorOccur++;
                 for (int j = 0; j < words.length; j++) {
-                    if(words[j][1].equals("VBP"))
+                    if(words[j][1].contains("VB") && words[j][1].contains("P"))
                         return j;
                 }
             }
@@ -644,7 +650,7 @@ public class GrammarRules extends AppCompatActivity {
                     if (!getTagsInput(words).contains("CC")) {
                         errorOccur++;
                         for (int j = i; j < words.length; j++) {
-                            if (words[j][1].equals("VBP"))
+                            if ((words[j][1].contains("VB") && words[j][1].contains("P")))
                                 return j;
                         }
                     }
@@ -664,7 +670,7 @@ public class GrammarRules extends AppCompatActivity {
                 if(!getTagsInput(words).contains("CC")) {
                     errorOccur++;
                     for (int j = 0; j < words.length; j++) {
-                        if (words[j][1].equals("VBP"))
+                        if ((words[j][1].contains("VB") && words[j][1].contains("P")))
                             return j;
                     }
                 }
@@ -683,12 +689,12 @@ public class GrammarRules extends AppCompatActivity {
                             for (int j = i+2; j < words.length; j++) {
                                 if (words[j][1].equals("NN") || words[j][1].equals("NNP")) {
                                     for (int k = j; k < words.length; k++) {
-                                        if (words[k][1].equals("VBP"))
+                                        if ((words[j][1].contains("VB") && words[j][1].contains("P")))
                                             return k;
                                     }
                                 } else if(words[j][1].equals("NNS") || words[j][1].equals("NNPS")){
                                     for (int k = j; k < words.length; k++) {
-                                        if (words[k][1].equals("VBZ"))
+                                        if ((words[j][1].contains("VB") && words[j][1].contains("Z")))
                                             return k;
                                     }
                                 }
@@ -734,7 +740,7 @@ public class GrammarRules extends AppCompatActivity {
         if(wordspos > numpos || words[numpos][0].equalsIgnoreCase("one") && wordspos - numpos == 1){
             errorOccur++;
             for (int j = wordspos; j < words.length; j++) {
-                if(words[j][1].equals("VBP"))
+                if((words[j][1].contains("VB") && words[j][1].contains("P")))
                     return j;
             }
         }
@@ -786,7 +792,7 @@ public class GrammarRules extends AppCompatActivity {
         //Pair of scissors.
         if(words[pairpos][0].equalsIgnoreCase("pair") && pairpos < wordspos ){
             for (int j = 0; j < words.length; j++) {
-                if(words[j][1].equals("VBP"))
+                if((words[j][1].contains("VB") && words[j][1].contains("P")))
                     return j;
             }
         }
@@ -794,13 +800,13 @@ public class GrammarRules extends AppCompatActivity {
         else if(wordspos - numpos == 1 || words[pairpos][0].equalsIgnoreCase("pairs") && numpos < pairpos && pairpos < wordspos
                 ) {
             for (int j = 0; j < words.length; j++) {
-                if (words[j][1].equals("VBZ"))
+                if ((words[j][1].contains("VB") && words[j][1].contains("Z")))
                     return j;
             }
         }
         else if(wordspos > 0 && numpos == 0 && pairpos == 0){
             for (int j = 0; j < words.length; j++) {
-                if (words[j][1].equals("VBZ"))
+                if ((words[j][1].contains("VB") && words[j][1].contains("Z")))
                     return j;
             }
         }
@@ -824,7 +830,7 @@ public class GrammarRules extends AppCompatActivity {
             errorOccur++;
             for(int i = 0; i<sentence.length; i++){
                 if(sentence[i][1].contains("VB")){
-                    if(sentence[i][1].equals("VBZ")){
+                    if(sentence[i][1].contains("Z")){
                         return i;
                     }
                 }
@@ -834,7 +840,7 @@ public class GrammarRules extends AppCompatActivity {
             errorOccur++;
             for(int i = 0; i<sentence.length; i++){
                 if(sentence[i][1].contains("VB")){
-                    if(sentence[i][1].equals("VBP")){
+                    if(sentence[i][1].contains("P")){
                         return i;
                     }
                 }
@@ -873,7 +879,7 @@ public class GrammarRules extends AppCompatActivity {
                 }
                 for(; start<words.length-1; start++){
                     if(words[start][1].contains("NN") && words[start+1][1].contains("VB")){
-                        if(((words[start][1].equals("NN") || words[start][1].equals("NNP")) && words[start+1][1].equals("VBZ")) || ((words[start][1].equals("NNS") || words[start][1].equals("NNPS")) && words[start+1][1].equals("VBP")))
+                        if(((words[start][1].equals("NN") || words[start][1].equals("NNP")) && (words[start+1][1].contains("VB") && words[start+1][1].contains("Z"))) || ((words[start][1].equals("NNS") || words[start][1].equals("NNPS")) && (words[start+1][1].equals("VB") && words[start+1][1].equals("P"))))
                             return 0;
                         else
                             return start+1;
@@ -882,7 +888,7 @@ public class GrammarRules extends AppCompatActivity {
             }
             else{
                 boolean plural = false;
-                if(words[0][1].equals("VBP"))
+                if(words[0][1].contains("VB") && words[0][1].contains("P"))
                     plural = true;
                 for (int i = 0; i < words.length-1; i++) {
                     if(words[i][1].contains("NN")){
@@ -914,7 +920,7 @@ public class GrammarRules extends AppCompatActivity {
                 if(words[i][1].equals("JJ") && words[i+1][1].contains("VB")){
                     Log.wtf("dsgdfgfgfgdf", "RULE FOUUUUUUUUUUR");
                     errorOccur++;
-                    if(words[i+1][1].equals("VBZ")) {
+                    if(words[i+1][1].contains("VB") && words[i+1][1].contains("Z")) {
                         Log.wtf("RULE FOUR", "not question");
                         return i + 1;
                     }
@@ -923,7 +929,7 @@ public class GrammarRules extends AppCompatActivity {
             else{
                 if( i != words.length - 2 && (words[i][1].contains("VB") && words[i+1][1].equals("DT") && words[i+2][1].equals("JJ"))){
                     errorOccur++;
-                    if(words[i][1].equals("VBZ")) {
+                    if(words[i][1].contains("VB") && words[i][1].contains("Z")) {
                         Log.wtf("RULE FOUR", " " + i);
                         return i;
                     }
@@ -944,7 +950,7 @@ public class GrammarRules extends AppCompatActivity {
                 getSentenceInput(words).toLowerCase().contains("both") || getSentenceInput(words).toLowerCase().contains("all")){
             errorOccur++;
             for (int j = 0; j < words.length; j++) {
-                if(words[j][1].equals("VBZ"))
+                if(words[j][1].contains("VB") && words[j][1].contains("Z"))
                     return j;
             }
         }
@@ -957,7 +963,7 @@ public class GrammarRules extends AppCompatActivity {
             if(isNumeric(words[i][0]) || words[i][1].equals("CD")){
                 errorOccur++;
                 for (int j = 0; j < words.length; j++) {
-                    if(words[j][1].equals("VBP"))
+                    if(words[j][1].contains("VB") && words[j][1].contains("P"))
                         return j;
                 }
             }
@@ -994,7 +1000,7 @@ public class GrammarRules extends AppCompatActivity {
     public static int BasicRulePlural(String words[][]){
         for (int i = 0; i<words.length; i ++) {
             //roses [is] beautiful
-            if(words[i][1].equalsIgnoreCase("VBZ")){
+            if(words[i][1].contains("VB") && words[i][1].contains("Z")){
                 for (int j = i; j >0; j--){
                     if(words[j][1].equalsIgnoreCase("NNS") || words[j][1].equalsIgnoreCase("NNPS")){
                         return i;
@@ -1010,7 +1016,7 @@ public class GrammarRules extends AppCompatActivity {
                     || words[i][0].equalsIgnoreCase("these") )) {
 
                 for (int j = i; j < words.length; j++) {
-                    if (words[j][1].equals("VBZ") || words[j][0].equalsIgnoreCase("am")) {
+                    if ((words[j][1].contains("VB") && words[j][1].contains("Z")) || words[j][0].equalsIgnoreCase("am")) {
                         return j;
                     }
                 }
@@ -1126,7 +1132,7 @@ public class GrammarRules extends AppCompatActivity {
             // love [are] blind
             if ((words[i][1].equals("NN") || words[i][1].equals("NNP")) && !words[i][0].contains("'")) {
                 for (int j = 0; j < words.length; j++) {
-                    if (words[j][1].equals("VBP")) {
+                    if (words[j][1].contains("VB") && words[j][1].contains("P")) {
                         Log.wtf("Basic 1", "true");
                         return j;
                     }
@@ -1138,7 +1144,7 @@ public class GrammarRules extends AppCompatActivity {
                     || words[i][0].equalsIgnoreCase("this") || words[i][0].equalsIgnoreCase("that"))) {
 
                 for (int j = i; j < words.length; j++) {
-                    if (words[j][1].equals("VBP")) {
+                    if (words[j][1].contains("VB") && words[j][1].contains("P")) {
                         Log.wtf("Basic 2", "true");
                         return j;
                     }
@@ -1281,17 +1287,20 @@ public class GrammarRules extends AppCompatActivity {
                     wordErrors.add(Integer.toString(x));
                     wordErrors.add("4"); ////COLOR
                     wordErrors.add(words[i][0]);
-                    if(words[i][0].charAt(words[i][0].length() - 1) == 's')
-                        wordErrors.add(words[i][0] + "\'");
+                    if(!(words[i+1][1].contains("NN")) && !words[i][1].contains("P")) {
+                        wordErrors.add(new Inflector().pluralize(words[i][0].substring(0, words[i][0].length() - 2)));
+                    }
+                    else if(words[i][0].contains("s's") && words[i][1].contains("P") && !(words[i+1][1].contains("NN")))
+                        wordErrors.add(words[i][0].substring(0,words[i][0].length()-2));
                     else
-                        wordErrors.add(words[i][0] + "\'s");
+                        wordErrors.add(words[i][0].substring(0,words[i][0].length()-1));
                     errors[k] = i;
                     sugg.add(wordErrors);
                 }
             }
             else {
                 Log.wtf("Plurpos", "no apos");
-                if ((words[i][1].equals("NNS") || words[i][1].equals("NNPS") || words[i][0].charAt(words[i][0].length() - 1) == 's') && words[i + 1][1].contains("NN")) {
+                if ((words[i][1].equals("NNS") || words[i][1].equals("NNPS") || words[i][1].equals("NNP")) && words[i + 1][1].contains("NN")) {
                     temp++;
                     ctr++;
                     wordErrors = new ArrayList<String>();
@@ -1320,7 +1329,7 @@ public class GrammarRules extends AppCompatActivity {
 
     public static ArrayList<String> VerbTense(String words[][]){
         ArrayList<String> verbErrors = new ArrayList<String>();
-        int present = 0,past = 0, future = 0;
+        int present = 0, past = 0, future = 0, pastdid = 0, advpast = 0;
         boolean error = false;
         if(getSentenceInput(words).toLowerCase().contains("at the moment") || getSentenceInput(words).toLowerCase().contains("for a little while")
                 || getSentenceInput(words).toLowerCase().contains("as we speak")){ //MORE THAN ONE_WORD HELPPPPPPPPPPPP
@@ -1335,11 +1344,11 @@ public class GrammarRules extends AppCompatActivity {
                     verbErrors.add(words[i + 1][0]);
                 }
             }
-            if(words[i][1].equalsIgnoreCase("VBD") || words[i][1].equalsIgnoreCase("VBN")){
+            if((words[i][1].contains("VBD") && !words[i][0].equalsIgnoreCase("did")) || words[i][1].equalsIgnoreCase("VBN")){
                 verbErrors.add(words[i][0]);
                 past++;
             }
-            if(words[i][1].equalsIgnoreCase("VBG") || words[i][1].equalsIgnoreCase("VBP") || words[i][1].equalsIgnoreCase("VBZ")){
+            if(words[i][1].equalsIgnoreCase("VBG") || words[i][1].equalsIgnoreCase("VBP") || words[i][1].equalsIgnoreCase("VBZ") || words[i][1].equalsIgnoreCase("VB")){
                 verbErrors.add(words[i][0]);
                 present++;
             }
@@ -1356,17 +1365,30 @@ public class GrammarRules extends AppCompatActivity {
             if(words[i][0].equalsIgnoreCase("ago") || words[i][0].equalsIgnoreCase("last")
                     || words[i][0].equalsIgnoreCase("yesterday") || words[i][0].equalsIgnoreCase("before")){
                 verbErrors.add(words[i][0]);
-                past++;
+                advpast++;
             }
             if(words[i][0].equalsIgnoreCase("next") || words[i][0].equalsIgnoreCase("tomorrow")){
                 verbErrors.add(words[i][0]);
                 future++;
             }
+            if(words[i][0].equalsIgnoreCase("did")){
+                for(int j = i + 1; j < words.length - 1; j++){
+                    if(words[j][1].contains("VB")){
+                        if(!words[j][1].equals("VB")) {
+                            verbErrors.add(words[i][0]);
+                            verbErrors.add(words[j][0]);
+                            Log.wtf("ENTER", "PAST DID " + words[j][1]);
+                            pastdid++;
+                        }
+                    }
+                }
+            }
 
         }
-        // Log.wtf("VERB TENSE", "past " + past + " present " + present + " future " + future + " error " + error);
-        Log.wtf("VERB TENSE", "1 " + (future == 0 && present == 0 && past > 0) + " 2 " + (present > 0 && past == 0 && future == 0) + " 3 " + (future > 0 && past == 0 && present == 0) + " 4 " + error);
-        if((future == 0 && present == 0 && past > 0) || (present > 0 && past == 0 && future == 0) || (future > 0 && past == 0 && present == 0) || error){
+        Log.wtf("VERB TENSE", "past " + past + " present " + present + " future " + future + " error " + error);
+        Log.wtf("VERB TENSE", "1 " + (future == 0 && present == 0 && (past > 0 || advpast > 0)) + " 2 " + (present > 0 && (past == 0  || advpast == 0) && future == 0) + " 3 " + (future > 0 && (past == 0  && advpast == 0) && present == 0) + " 4 " + error + " past did " + pastdid + " " + (pastdid == 0));
+
+        if(((future == 0 && present == 0 && (past > 0 && advpast > 0)) || (present > 0 && (past == 0  && advpast == 0) && future == 0) || (future > 0 && (past == 0  && advpast == 0) && present == 0) || error ) && pastdid == 0){
             Log.wtf("NO ERROR ", "verb tense");
             verbErrors.clear();
         }
@@ -1391,7 +1413,7 @@ public class GrammarRules extends AppCompatActivity {
         for (int i = 0; i < words.length; i++) {
             //no subject Ex. Running down the streets.
             if(words[i][1].equalsIgnoreCase("VB") ||
-                    words[i][1].equalsIgnoreCase("VBD") ||
+                    words[i][1].contains("VBD") ||
                     words[i][1].equalsIgnoreCase("VBG") ||
                     words[i][1].equalsIgnoreCase("VBN") ||
                     words[i][1].equalsIgnoreCase("VBP") ||
@@ -1445,6 +1467,8 @@ public class GrammarRules extends AppCompatActivity {
                     words[i][1].equalsIgnoreCase("VBN") ||
                     words[i][1].equalsIgnoreCase("VBP") ||
                     words[i][1].equalsIgnoreCase("VBZ") ||
+                    words[i][1].equalsIgnoreCase("VBDZ") ||
+                    words[i][1].equalsIgnoreCase("VBDP") ||
                     words[i][1].equalsIgnoreCase("IN")){
                 ++nverb;
 
@@ -1620,10 +1644,6 @@ public class GrammarRules extends AppCompatActivity {
             }
         }
         return 0;
-    }
-
-    public String GetResult(){
-        return output;
     }
 
     public ArrayList<ArrayList<String>> GetSuggestion(){

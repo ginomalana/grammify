@@ -1,16 +1,19 @@
 package com.gino.grammify;
 
-import android.annotation.TargetApi;
+import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.Typeface;
+import android.net.Uri;
 import android.os.AsyncTask;
-import android.os.Build;
+import android.os.Bundle;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.Spanned;
@@ -588,6 +591,7 @@ public class CheckGrammar extends AppCompatActivity {
         protected void onPostExecute(Object o) {
             super.onPostExecute(o);
             dismissDialog(progress_bar_type);
+
             GrammarRules gr = new GrammarRules(pst.GetTags(), pst.getChunk());
             SetSuggestion(gr.GetSuggestion(), gr.GetSentence());
         }
