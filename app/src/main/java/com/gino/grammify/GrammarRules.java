@@ -227,7 +227,7 @@ public class GrammarRules extends AppCompatActivity {
 
                     ctr++;
                 }
-                else if (ruleFour > -1 && hold == 0) {
+                else if (ruleFour > -1 && errorOccur == 0) {
                     //sb.append("\nRule #4 Error at word/s: " + words[RuleFour(words)][0]);
                     //sb = new StringBuffer(sentence.replace(" " + words[ruleFour][0] + " ",
                     //      " " + new Inflector().singularize(words[ruleFour][0]) + " "));
@@ -1016,7 +1016,7 @@ public class GrammarRules extends AppCompatActivity {
                     || words[i][0].equalsIgnoreCase("these") )) {
 
                 for (int j = i; j < words.length; j++) {
-                    if ((words[j][1].contains("VB") && words[j][1].contains("Z")) || words[j][0].equalsIgnoreCase("am")) {
+                    if ((words[j][1].contains("VB") && words[j][1].contains("Z")) || words[j][0].equalsIgnoreCase("am") || words[j][0].equalsIgnoreCase("is")) {
                         return j;
                     }
                 }
@@ -1046,16 +1046,18 @@ public class GrammarRules extends AppCompatActivity {
             // starts with wh-question
             if(words[0][1].equals("WRB") || words[0][1].equals("WP")){
                 //wh question is
-                if(words[i+1][0].equals("is")){
-                    for (int j = 0; j < words.length; j++) {
-                        // error on how is your [dogs]
-                        if(words[j][1].equals("PRP") && words[j][0].equalsIgnoreCase("your")) {
-                            for (int k = j; k < words.length; k++) {
-                                if (words[k][1].equals("NNS")) {
-                                    return k;
+                if(i + 1 < words.length -1) {
+                    if (words[i + 1][0].equals("is")) {
+                        for (int j = 0; j < words.length; j++) {
+                            // error on how is your [dogs]
+                            if (words[j][1].equals("PRP") && words[j][0].equalsIgnoreCase("your")) {
+                                for (int k = j; k < words.length; k++) {
+                                    if (words[k][1].equals("NNS")) {
+                                        return k;
+                                    }
                                 }
-                            }
 
+                            }
                         }
                     }
                 }
@@ -1163,12 +1165,14 @@ public class GrammarRules extends AppCompatActivity {
             // starts with wh-question
             if(words[0][1].equals("WRB") || words[0][1].equals("WP")) {
                 // wh question are
-                if (words[i + 1][0].equals("are")) {
-                    // error on how are your [dog]
-                    for (int j = 0; j < words.length; j++) {
-                        if (words[j][1].equals("NN")) {
-                            Log.wtf("Basic 4", "true");
-                            return j;
+                if(i + 1 < words.length-1) {
+                    if (words[i + 1][0].equals("are")) {
+                        // error on how are your [dog]
+                        for (int j = 0; j < words.length; j++) {
+                            if (words[j][1].equals("NN")) {
+                                Log.wtf("Basic 4", "true");
+                                return j;
+                            }
                         }
                     }
                 }
@@ -1231,13 +1235,15 @@ public class GrammarRules extends AppCompatActivity {
             // starts with wh-question
             if (words[0][1].equals("WRB") || words[0][1].equals("WP")) {
                 // wh question are
-                if (words[i + 1][0].equals("are")) {
+                if(i+1 < words.length - 1) {
+                    if (words[i + 1][0].equals("are")) {
 
-                    for (int j = 0; j < words.length; j++) {
-                        //are [that]
-                        if ((words[j][0].equalsIgnoreCase("that") || words[j][0].equalsIgnoreCase("this"))
-                                || (words[j][0].equalsIgnoreCase("that?") || words[j][0].equalsIgnoreCase("this?"))) {
-                            return j;
+                        for (int j = 0; j < words.length; j++) {
+                            //are [that]
+                            if ((words[j][0].equalsIgnoreCase("that") || words[j][0].equalsIgnoreCase("this"))
+                                    || (words[j][0].equalsIgnoreCase("that?") || words[j][0].equalsIgnoreCase("this?"))) {
+                                return j;
+                            }
                         }
                     }
                 }
@@ -1336,19 +1342,24 @@ public class GrammarRules extends AppCompatActivity {
             present++;
         }
         for (int i = 0; i < words.length; i++) {
-            if(words[i][1].equals("MD")){
+            if(words[i][1].equals("MD")) {
                 future++;
-                verbErrors.add(words[i][0]);
-                if(!words[i+1][1].equals("VB")) {
-                    error = true;
-                    verbErrors.add(words[i + 1][0]);
+                for (int j = i + 1; j < words.length - 1; j++) {
+                    if (words[j][1].contains("VB")) {
+                        if (!words[j][1].equals("VB")) {
+                            error = true;
+                            verbErrors.add(words[i][0]);
+                            verbErrors.add(words[j][0]);
+                        }
+
+                    }
                 }
             }
             if((words[i][1].contains("VBD") && !words[i][0].equalsIgnoreCase("did")) || words[i][1].equalsIgnoreCase("VBN")){
                 verbErrors.add(words[i][0]);
                 past++;
             }
-            if(words[i][1].equalsIgnoreCase("VBG") || words[i][1].equalsIgnoreCase("VBP") || words[i][1].equalsIgnoreCase("VBZ") || words[i][1].equalsIgnoreCase("VB")){
+            if(words[i][1].equalsIgnoreCase("VBG") || words[i][1].equalsIgnoreCase("VBP") || words[i][1].equalsIgnoreCase("VBZ")/* || words[i][1].equalsIgnoreCase("VB")*/){
                 verbErrors.add(words[i][0]);
                 present++;
             }
@@ -1388,7 +1399,8 @@ public class GrammarRules extends AppCompatActivity {
         Log.wtf("VERB TENSE", "past " + past + " present " + present + " future " + future + " error " + error);
         Log.wtf("VERB TENSE", "1 " + (future == 0 && present == 0 && (past > 0 || advpast > 0)) + " 2 " + (present > 0 && (past == 0  || advpast == 0) && future == 0) + " 3 " + (future > 0 && (past == 0  && advpast == 0) && present == 0) + " 4 " + error + " past did " + pastdid + " " + (pastdid == 0));
 
-        if(((future == 0 && present == 0 && (past > 0 && advpast > 0)) || (present > 0 && (past == 0  && advpast == 0) && future == 0) || (future > 0 && (past == 0  && advpast == 0) && present == 0) || error ) && pastdid == 0){
+        Log.wtf("VERB TENSE WARNINGGGG", "RESULT : " + (((future == 0 && present == 0 && (past > 0 && advpast > 0)) || (present > 0 && (past == 0  && advpast == 0) && future == 0) || (future > 0 && (past == 0  && advpast == 0) && present == 0) || !error ) && (pastdid == 0)));
+        if(((future == 0 && present == 0 && (past > 0 && advpast > 0)) || (present > 0 && (past == 0  && advpast == 0) && future == 0) || (future > 0 && (past == 0  && advpast == 0) && present == 0) || !error ) && (pastdid == 0)){
             Log.wtf("NO ERROR ", "verb tense");
             verbErrors.clear();
         }
@@ -1644,6 +1656,10 @@ public class GrammarRules extends AppCompatActivity {
             }
         }
         return 0;
+    }
+
+    public String GetResult(){
+        return output;
     }
 
     public ArrayList<ArrayList<String>> GetSuggestion(){

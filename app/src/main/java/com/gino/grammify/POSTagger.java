@@ -90,7 +90,10 @@ public class POSTagger {
                 tags = tagger.tag(whitespaceTokenizerLine);
 
                 POSSample sample = new POSSample(whitespaceTokenizerLine, tags);
-                posTag.append(sample.toString() + (splittedSentence.get(i).get(1)) + " ");
+                if (splittedSentence.get(i).get(1).equals(" "))
+                    posTag.append(sample.toString() + ". ");
+                else
+                    posTag.append(sample.toString() + (splittedSentence.get(i).get(1)) + " ");
                 perfMon.incrementCounter();
             }
             perfMon.stopAndPrintFinalResult();

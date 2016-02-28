@@ -212,6 +212,7 @@ class CheckWord extends Thread {
                         for (int x = 0; x < word.length(); x++) {
                             if (word.length() > x && wr.length() > x) {
                                 if (wr.charAt(x) == word.charAt(x)) {
+
                                     //if (distance(wr.toCharArray(), word.toCharArray()) /*== dist.get(0)*/ <= 1 ) {
                                     if (new DamerauLevenshtein(wr,word).getSimilarity() <= 1) {
                                         String sugg;

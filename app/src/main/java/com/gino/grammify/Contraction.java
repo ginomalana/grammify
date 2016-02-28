@@ -85,7 +85,7 @@ public class Contraction {
         //NEGATING A VERB
         Contraction.addContractions("^(isn|isn')t$", "is not");
         Contraction.addContractions("^(aren|aren')t$", "are not");
-        Contraction.addContractions("^(was|was')t$", "was not");
+        Contraction.addContractions("^(wasn|wasn')t$", "was not");
         Contraction.addContractions("^(have|have')t$", "have not");
         Contraction.addContractions("^(hasn|hasn')t$", "has not");
         Contraction.addContractions("^(hadn|hadn')t$", "had not");
@@ -105,6 +105,9 @@ public class Contraction {
         Contraction.addContractions("^(could|could')ve$", "could have");
         Contraction.addContractions("^(might|might')ve$", "might have");
         Contraction.addContractions("^(must|must')ve$", "must have");
+        //NEGATION
+        Contraction.addContractions("^(weren|weren')t$", "were not");
+
     }
 
     static void addContractions(String rule, String replacement) {
