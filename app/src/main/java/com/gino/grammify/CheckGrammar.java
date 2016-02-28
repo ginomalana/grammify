@@ -168,7 +168,16 @@ public class CheckGrammar extends AppCompatActivity {
                                                     if (suggst.get(l).get(2).equals(markedWord))
                                                         suggst.remove(l);
                                                 }
-                                                String replacement = sentence.get(positionI).replace(markedWord, item.getTitle().toString());
+                                                String replacement = sentence.get(positionI);
+                                                Pattern p = Pattern.compile("\\b"+ markedWord +"\\b");
+                                                Matcher m = p.matcher(replacement);
+                                                m.find();
+                                                System.out.println(m.start());
+                                                System.out.println(m.end());
+                                                replacement = replacement.substring(0,m.start()) + item.getTitle().toString() + replacement.substring(m.end());
+                                                System.out.println(replacement);
+
+                                                //String replacement = sentence.get(positionI).replace(markedWord, item.getTitle().toString());
                                                 SetSuggestion(suggst, paragraph.replace(sentence.get(positionI), replacement));
                                                 return true;
                                             }
@@ -176,9 +185,13 @@ public class CheckGrammar extends AppCompatActivity {
                                         popup.show();
                                     }
                                 };
+                                String replacement = sentence.get(positionI);
+                                Pattern p = Pattern.compile("\\b"+ markedWord +"\\b");
+                                Matcher m = p.matcher(replacement);
+                                m.find();
                                 ss.setSpan(clickableSpan,
-                                        paragraph.indexOf(sentence.get(i)) + sentence.get(i).indexOf(suggst.get(j).get(2)), //START
-                                        paragraph.indexOf(sentence.get(i)) + sentence.get(i).indexOf(suggst.get(j).get(2)) + suggst.get(j).get(2).length(), //END
+                                        paragraph.indexOf(sentence.get(i)) + m.start(), //START
+                                        paragraph.indexOf(sentence.get(i)) + m.end(), //END
                                         Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
                             }
                         }
