@@ -32,7 +32,7 @@ public class LaunchScreenActivity extends AppCompatActivity {
         new POSTagger();
 
         //Exit splash screen
-        new BackgroundTask().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, null);
+        new BackgroundTask().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, "0");
 
 
     }

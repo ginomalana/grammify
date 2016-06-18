@@ -310,6 +310,7 @@ public class Inflector {
         inflect.addPluralize("^(were)$", "was");
         inflect.addPluralize("^(have)$", "has");
         inflect.addPluralize("^(go|do)$", "$1es");
+        inflect.addPluralize("^(feet)$", "feet");
 
         inflect.addSingularize("s$", "");
         inflect.addSingularize("(s|si|u)s$", "$1s"); // '-us' and '-ss' are already singular
@@ -373,10 +374,11 @@ public class Inflector {
         inflect.addIrregular("loaf", "loaves");
         inflect.addIrregular("thief", "thieves");
         inflect.addIrregular("radius", "radii");
-
+        inflect.addIrregular("deserve", "deserves");
+        inflect.addIrregular("love", "loves");
 
         inflect.addUncountable("equipment", "information", "rice", "money", "species",
-                "series", "fish", "sheep", "deer", "barracks", "noisy", "am");
+                "series", "fish", "sheep", "deer", "barracks", "noisy", "am", "had");
     }
 
 }

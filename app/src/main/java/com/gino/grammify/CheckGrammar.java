@@ -86,7 +86,7 @@ public class CheckGrammar extends AppCompatActivity {
         //TEMP
 
         try {
-            new BackgroundCheckWord().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, null);
+            new BackgroundCheckWord().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, "");
         } catch (Exception e) {
             Log.wtf("SpellCheck Exception ", e.toString());
         }
@@ -541,7 +541,7 @@ public class CheckGrammar extends AppCompatActivity {
         switch (id) {
             case progress_bar_type: // we set this to 0
                 pDialog = new ProgressDialog(this);
-                pDialog.setMessage("Checking Spelling...");
+                pDialog.setMessage("Checking...");
                 pDialog.setCancelable(false);
                 pDialog.show();
                 return pDialog;

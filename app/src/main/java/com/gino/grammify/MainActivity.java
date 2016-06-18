@@ -1,56 +1,40 @@
 package com.gino.grammify;
 
 import android.Manifest;
-import android.app.Dialog;
-import android.app.FragmentManager;
-import android.app.Fragment;
-import android.app.ProgressDialog;
+import android.support.v4.app.Fragment;
 import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
-import android.content.res.AssetManager;
-import android.graphics.Typeface;
-import android.os.AsyncTask;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Environment;
 import android.os.Handler;
 import android.speech.RecognizerIntent;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.ImageButton;
-import android.widget.TextView;
 import android.widget.Toast;
-import android.text.Editable;
-import android.text.TextWatcher;
 
-import java.io.BufferedInputStream;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.net.URL;
-import java.net.URLConnection;
+import com.google.android.gms.appindexing.Action;
+import com.google.android.gms.appindexing.AppIndex;
+import com.google.android.gms.common.api.GoogleApiClient;
 import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity
-        /*implements NavigationView.OnNavigationItemSelectedListener*/ {
+        implements NavigationView.OnNavigationItemSelectedListener {
 
     boolean doubleBackToExitPressedOnce = false;
 
@@ -61,11 +45,16 @@ public class MainActivity extends AppCompatActivity
 
     static String sentence;
     private EditText input;
-    private TextView status;
     private ImageButton button;
+    static FragmentMain fm;
     protected static final int RESULT_SPEECH = 1;
 
     View topLevelLayout;
+    /**
+     * ATTENTION: This was auto-generated to implement the App Indexing API.
+     * See https://g.co/AppIndexing/AndroidStudio for more information.
+     */
+    private GoogleApiClient client;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -76,33 +65,42 @@ public class MainActivity extends AppCompatActivity
         }
 
         //MARSHMALLOW PERMISSION
-        ActivityCompat.requestPermissions(MainActivity.this,new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, 1);
+        ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, 1);
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        //DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        //ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
-        //        this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
-        //drawer.setDrawerListener(toggle);
-        //toggle.syncState();
 
-        //NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
-        //navigationView.setNavigationItemSelectedListener(this);
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
+                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+        drawer.setDrawerListener(toggle);
+        toggle.syncState();
 
-        button = (ImageButton) findViewById(R.id.imageButton);
-        input = (EditText) findViewById(R.id.editText);
-        status = (TextView) findViewById(R.id.textView);
+        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+        navigationView.setNavigationItemSelectedListener(this);
 
-        Typeface face= Typeface.createFromAsset(getAssets(), "font_chalk.ttf");
+        //FIRST FRAGMENT
+        FragmentTransaction tx = getSupportFragmentManager().beginTransaction();
+        tx.replace(R.id.content_frame, new FragmentMain());
+        tx.commit();
+        navigationView.getMenu().getItem(0).setChecked(true);
 
-        input.setTypeface(face);
+        fm = new FragmentMain();
+
+        button = fm.getImageButton();
+        input = fm.getInputText();
+
+        /* */
 
         //TEMP
-        topLevelLayout = findViewById(R.id.top_layout);
+        /*topLevelLayout = findViewById(R.id.top_layout);
         if (isFirstTime()) {
             topLevelLayout.setVisibility(View.INVISIBLE);
-        }
+        }*/
+        // ATTENTION: This was auto-generated to implement the App Indexing API.
+        // See https://g.co/AppIndexing/AndroidStudio for more information.
+        client = new GoogleApiClient.Builder(this).addApi(AppIndex.API).build();
     }
 
     //MARSHMALLOW PERMISSION
@@ -112,8 +110,7 @@ public class MainActivity extends AppCompatActivity
             case 1: {
                 if (grantResults.length > 0
                         && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                }
-                else {
+                } else {
                     Toast.makeText(MainActivity.this, "Permission deny to read your External storage", Toast.LENGTH_SHORT).show();
                 }
                 return;
@@ -124,14 +121,12 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public void onBackPressed() {
-        /*DRAWER
+
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
-        }
+        } else {
 
-        else {
-        */
             if (doubleBackToExitPressedOnce) {
                 super.onBackPressed();
                 return;
@@ -139,22 +134,24 @@ public class MainActivity extends AppCompatActivity
             this.doubleBackToExitPressedOnce = true;
             Toast.makeText(this, "Please click BACK again to exit", Toast.LENGTH_SHORT).show();
 
-        //}
+        }
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
-                doubleBackToExitPressedOnce=false;
-            }}, 2000);
+                doubleBackToExitPressedOnce = false;
+            }
+        }, 2000);
     }
 
-
-    /*@Override
+    //THREE DOT MENU
+    /*
+    @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.main, menu);
         return true;
-    }*/
-    /*
+    }
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle action bar item clicks here. The action bar will
@@ -170,50 +167,55 @@ public class MainActivity extends AppCompatActivity
         return super.onOptionsItemSelected(item);
     }
     */
-    /* DRAWER
+
+    public void displayView(int viewId) {
+        Fragment fragment = null;
+        String title = getString(R.string.app_name);
+
+        switch (viewId) {
+            case R.id.nav_menu:
+                fragment = new FragmentMain();
+                title  = "Grammify";
+
+                break;
+            case R.id.nav_about:
+                InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+                imm.hideSoftInputFromWindow(getWindow().getDecorView().getRootView().getWindowToken(), 0);
+                fragment = new FragmentAbout();
+                title = "About";
+                break;
+
+        }
+
+        if (fragment != null) {
+            FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+            ft.replace(R.id.content_frame, fragment);
+            ft.commit();
+        }
+
+        // set the toolbar title
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().setTitle(title);
+        }
+
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        drawer.closeDrawer(GravityCompat.START);
+
+    }
+
+
     @SuppressWarnings("StatementWithEmptyBody")
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
         // Handle navigation view item clicks here.
-        Fragment fragment = null;
-        FragmentManager fragmentManager = getFragmentManager();
-
-
-        int id = item.getItemId();
-        if (id == R.id.nav_menu) {
-            fragment = new MyFragment1();
-        } else if (id == R.id.nav_about) {
-            fragment = new MyFragment2();
-        }
-        fragmentManager.beginTransaction()
-                .replace(R.id.drawer_layout, fragment)
-                .commit();
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        drawer.closeDrawer(GravityCompat.START);
+        displayView(item.getItemId());
         return true;
     }
 
-    public static class MyFragment1 extends Fragment {
-        @Override
-        public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                                 Bundle savedInstanceState) {
-            // Inflate the layout for this fragment
-            return inflater.inflate(R.layout.content_main, container, false);
-        }
-    }
-
-    public static class MyFragment2 extends Fragment {
-        @Override
-        public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                                 Bundle savedInstanceState) {
-            // Inflate the layout for this fragment
-            return inflater.inflate(R.layout.content_about, container, false);
-        }
-    }
-*/
 
     public void VoiceInput(View view) {
-        input.setEnabled(!input.isEnabled());
+        fm.switchInput();
+
         ListeningText(true);
         //Voice Recognition
         Intent intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
@@ -228,7 +230,7 @@ public class MainActivity extends AppCompatActivity
     public void CheckGrammar(View view) {
         InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
         imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
-        sentence = input.getText().toString();
+        sentence = fm.getSentence();
         if (sentence.length() == 0)
             Toast("Please enter sentence");
         else {
@@ -254,18 +256,18 @@ public class MainActivity extends AppCompatActivity
 
     public void ListeningText(boolean en) {
         if (en) {
-            button.setBackgroundResource(R.drawable.ic_microphone_grey600_24dp);
-            status.setText("Listening");
+            fm.changeButton();
+            fm.setStatusListening();
             final Handler handler = new Handler();
             final Runnable updateTask = new Runnable() {
                 @Override
                 public void run() {
-                    if (input.isEnabled())
+                    if (fm.inputEnabled())
                         Thread.currentThread().interrupt();
                     else {
-                        status.setText(status.getText() + ".");
-                        if (status.getText().toString().contains("...."))
-                            status.setText("Listening");
+                        fm.setStatusDot();
+                        if (fm.statusFourDots())
+                            fm.setStatusListening();
                         handler.postDelayed(this, 1400);
                     }
                 }
@@ -273,9 +275,9 @@ public class MainActivity extends AppCompatActivity
             handler.postDelayed(updateTask, 1000);
         }
         if (!en) {
-            input.setEnabled(!input.isEnabled());
-            status.setText("");
-            button.setBackgroundResource(R.drawable.ic_microphone_black_24dp);
+            fm.switchInput();
+            fm.setStatusNull();
+            fm.changeButton2();
         }
     }
 
@@ -286,7 +288,7 @@ public class MainActivity extends AppCompatActivity
             case RESULT_SPEECH: {
                 if (resultCode == RESULT_OK && null != data) {
                     ArrayList<String> text = data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
-                    input.append(text.get(0).substring(0, 1).toUpperCase() + text.get(0).substring(1) + ". ");
+                    fm.inputVoiceResult(text);
                 }
                 ListeningText(false);
                 break;
@@ -299,8 +301,7 @@ public class MainActivity extends AppCompatActivity
         return sentence;
     }
 
-    private boolean isFirstTime()
-    {
+    private boolean isFirstTime() {
         SharedPreferences preferences = getPreferences(MODE_PRIVATE);
         boolean ranBefore = preferences.getBoolean("RanBefore", false);
         if (!ranBefore) {
@@ -309,7 +310,7 @@ public class MainActivity extends AppCompatActivity
             editor.putBoolean("RanBefore", true);
             editor.commit();
             topLevelLayout.setVisibility(View.VISIBLE);
-            topLevelLayout.setOnTouchListener(new View.OnTouchListener(){
+            topLevelLayout.setOnTouchListener(new View.OnTouchListener() {
 
                 @Override
                 public boolean onTouch(View v, MotionEvent event) {
@@ -325,4 +326,43 @@ public class MainActivity extends AppCompatActivity
 
     }
 
+    @Override
+    public void onStart() {
+        super.onStart();
+
+        // ATTENTION: This was auto-generated to implement the App Indexing API.
+        // See https://g.co/AppIndexing/AndroidStudio for more information.
+        client.connect();
+        Action viewAction = Action.newAction(
+                Action.TYPE_VIEW, // TODO: choose an action type.
+                "Main Page", // TODO: Define a title for the content shown.
+                // TODO: If you have web page content that matches this app activity's content,
+                // make sure this auto-generated web page URL is correct.
+                // Otherwise, set the URL to null.
+                Uri.parse("http://host/path"),
+                // TODO: Make sure this auto-generated app URL is correct.
+                Uri.parse("android-app://com.gino.grammify/http/host/path")
+        );
+        AppIndex.AppIndexApi.start(client, viewAction);
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+
+        // ATTENTION: This was auto-generated to implement the App Indexing API.
+        // See https://g.co/AppIndexing/AndroidStudio for more information.
+        Action viewAction = Action.newAction(
+                Action.TYPE_VIEW, // TODO: choose an action type.
+                "Main Page", // TODO: Define a title for the content shown.
+                // TODO: If you have web page content that matches this app activity's content,
+                // make sure this auto-generated web page URL is correct.
+                // Otherwise, set the URL to null.
+                Uri.parse("http://host/path"),
+                // TODO: Make sure this auto-generated app URL is correct.
+                Uri.parse("android-app://com.gino.grammify/http/host/path")
+        );
+        AppIndex.AppIndexApi.end(client, viewAction);
+        client.disconnect();
+    }
 }
